@@ -1,0 +1,26 @@
+{
+  "name": "badminton-results-collector",
+  "version": "1.0.0",
+  "description": "バドミントン協会サイトから大会結果PDFを自動取得し、data.json に変換するバックエンド",
+  "main": "index.js",
+  "scripts": {
+    "start": "node auto.js",
+    "parse-local": "node index.js --pdf",
+    "bracket": "node bracket.js",
+    "import": "node index.js --import",
+    "auto": "node auto.js"
+  },
+  "dependencies": {
+    "axios": "^1.7.2",
+    "cheerio": "^1.0.0-rc.12",
+    "pdf-parse": "^1.1.1",
+    "pdf2json": "^3.1.4"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "optionalDependencies": {
+    "tesseract.js": "^5.1.0",
+    "pdf-to-img": "^4.2.0"
+  }
+}

@@ -1,0 +1,1577 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>バドミントン成績アーカイブ | 検索・ランキング</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700;900&family=Barlow+Condensed:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --court:#0E5C49; --court-deep:#093F32; --chalk:#F5F3EC;
+    --shuttle:#F5B92E; --ink:#1C2A25;
+  }
+  body{ font-family:'Zen Kaku Gothic New',sans-serif; background:#F3F5F1; color:var(--ink); }
+  .num{ font-family:'Barlow Condensed',sans-serif; }
+  /* コートのダブルライン（サービスライン）をヘッダー下に */
+  .court-line{ border-bottom:3px solid var(--chalk); box-shadow:0 6px 0 -3px var(--chalk); }
+  .tab-active{ background:var(--court); color:var(--chalk); }
+  .tab-idle{ background:transparent; color:var(--court-deep); }
+  .tab-idle:hover{ background:#DCE7E1; }
+  .rank-1{ background:var(--shuttle); color:var(--court-deep); }
+  .rank-2{ background:#C9CFCB; color:var(--court-deep); }
+  .rank-3{ background:#D9A47A; color:var(--court-deep); }
+  .rank-n{ background:#E4EAE6; color:var(--court-deep); }
+  tbody tr:hover{ background:#EDF3EF; }
+  input:focus,select:focus{ outline:2px solid var(--court); outline-offset:1px; }
+  @media (prefers-reduced-motion: reduce){ *{ transition:none!important; animation:none!important; } }
+</style>
+</head>
+<body class="min-h-screen">
+
+<!-- ============================== ヘッダー ============================== -->
+<header class="court-line" style="background:linear-gradient(120deg,var(--court-deep),var(--court))">
+  <div class="max-w-6xl mx-auto px-4 py-6 flex flex-wrap items-end justify-between gap-4">
+    <div>
+      <p class="text-xs tracking-[0.3em] font-bold" style="color:var(--shuttle)">BADMINTON RESULTS ARCHIVE</p>
+      <h1 class="text-3xl md:text-4xl font-black" style="color:var(--chalk)">バドミントン成績アーカイブ</h1>
+      <p class="text-sm mt-1" style="color:#BFD6CD">大会結果の検索・年度別一覧・ポイントランキング</p>
+    </div>
+    <div class="flex items-center gap-3">
+      <span id="data-source" class="text-xs px-3 py-1 rounded-full border" style="color:#BFD6CD;border-color:#3E7565">データ: 内蔵（長野県協会 公開結果）</span>
+      <label class="px-4 py-2 rounded font-bold text-sm cursor-pointer transition hover:brightness-125 border" style="color:var(--chalk);border-color:#3E7565">
+        📂 data.json読込<input id="file-import" type="file" accept=".json" class="hidden">
+      </label>
+      <button onclick="downloadApp()" class="px-4 py-2 rounded font-bold text-sm transition hover:brightness-110" style="background:var(--shuttle);color:var(--court-deep)">
+        ⬇ アプリを保存する（HTMLダウンロード）
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- ============================== タブ ============================== -->
+<nav class="max-w-6xl mx-auto px-4 mt-6 space-y-3">
+  <div class="flex gap-2 flex-wrap items-center">
+    <span class="text-xs font-bold" style="color:var(--court-deep)">区分:</span>
+    <button data-div="小中学生" class="div-btn tab-active px-4 py-1.5 rounded-full font-bold text-xs transition">小中学生</button>
+    <button data-div="小学生" class="div-btn tab-idle px-4 py-1.5 rounded-full font-bold text-xs transition">小学生</button>
+    <button data-div="中学生" class="div-btn tab-idle px-4 py-1.5 rounded-full font-bold text-xs transition">中学生</button>
+    <button data-div="社会人" class="div-btn tab-idle px-4 py-1.5 rounded-full font-bold text-xs transition">社会人</button>
+    <button data-div="" class="div-btn tab-idle px-4 py-1.5 rounded-full font-bold text-xs transition">すべて</button>
+    <select id="f-pref" class="ml-2 border rounded px-2 py-1 text-xs bg-white"></select>
+  </div>
+  <div class="flex gap-2 flex-wrap">
+    <button data-tab="search" class="tab-btn tab-active px-5 py-2 rounded font-bold text-sm transition">🔎 検索</button>
+    <button data-tab="browse" class="tab-btn tab-idle px-5 py-2 rounded font-bold text-sm transition">📅 年度・カテゴリ別</button>
+    <button data-tab="ranking" class="tab-btn tab-idle px-5 py-2 rounded font-bold text-sm transition">🏆 総合ランキング</button>
+  </div>
+</nav>
+
+<main class="max-w-6xl mx-auto px-4 py-6 space-y-6">
+
+  <!-- ============================== 検索タブ ============================== -->
+  <section id="tab-search" class="tab-panel space-y-4">
+    <div class="bg-white rounded-lg shadow p-4 grid gap-3 md:grid-cols-4">
+      <div class="md:col-span-2">
+        <label class="block text-xs font-bold mb-1" for="q">キーワード（選手名・チーム名・大会名）</label>
+        <input id="q" type="text" placeholder="例: 山田 / 長野クラブ / 春季大会" class="w-full border rounded px-3 py-2 text-sm">
+      </div>
+      <div>
+        <label class="block text-xs font-bold mb-1" for="f-year">年度</label>
+        <select id="f-year" class="w-full border rounded px-3 py-2 text-sm"></select>
+      </div>
+      <div>
+        <label class="block text-xs font-bold mb-1" for="f-cat">カテゴリ</label>
+        <select id="f-cat" class="w-full border rounded px-3 py-2 text-sm"></select>
+      </div>
+    </div>
+    <div class="bg-white rounded-lg shadow overflow-hidden">
+      <div class="px-4 py-3 flex justify-between items-center" style="background:var(--court-deep)">
+        <h2 class="font-bold text-sm" style="color:var(--chalk)">検索結果（過去成績一覧）</h2>
+        <div class="flex items-center gap-3">
+          <button onclick="exportCsv()" class="text-xs px-3 py-1 rounded border font-bold hover:brightness-125" style="color:var(--chalk);border-color:#3E7565">CSV出力</button>
+          <span id="search-count" class="num text-lg font-bold" style="color:var(--shuttle)"></span>
+        </div>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="text-left text-xs" style="background:#E4EAE6;color:var(--court-deep)">
+              <th class="px-4 py-2">年度</th><th class="px-4 py-2">県</th><th class="px-4 py-2">大会</th><th class="px-4 py-2">カテゴリ</th>
+              <th class="px-4 py-2">順位</th><th class="px-4 py-2">選手名</th><th class="px-4 py-2">チーム</th><th class="px-4 py-2 text-right">獲得pt</th>
+            </tr>
+          </thead>
+          <tbody id="search-body"></tbody>
+        </table>
+      </div>
+      <p id="search-empty" class="hidden px-4 py-8 text-center text-sm text-gray-500">該当する成績がありません。キーワードや絞り込みを変えてください。</p>
+    </div>
+  </section>
+
+  <!-- ============================== 年度・カテゴリ別タブ ============================== -->
+  <section id="tab-browse" class="tab-panel hidden space-y-4">
+    <div class="bg-white rounded-lg shadow p-4 flex flex-wrap gap-3">
+      <div>
+        <label class="block text-xs font-bold mb-1" for="b-year">年度</label>
+        <select id="b-year" class="border rounded px-3 py-2 text-sm"></select>
+      </div>
+      <div>
+        <label class="block text-xs font-bold mb-1" for="b-gender">性別</label>
+        <select id="b-gender" class="border rounded px-3 py-2 text-sm">
+          <option value="">すべて</option><option>男子</option><option>女子</option><option>混合</option>
+        </select>
+      </div>
+    </div>
+    <div id="browse-area" class="space-y-4"></div>
+  </section>
+
+  <!-- ============================== ランキングタブ ============================== -->
+  <section id="tab-ranking" class="tab-panel hidden space-y-4">
+    <div class="bg-white rounded-lg shadow p-4 flex flex-wrap items-end gap-3">
+      <div>
+        <label class="block text-xs font-bold mb-1">集計対象</label>
+        <div class="flex rounded overflow-hidden border" style="border-color:var(--court)">
+          <button id="rk-player" onclick="setRankMode('player')" class="px-4 py-2 text-sm font-bold tab-active">選手別</button>
+          <button id="rk-team" onclick="setRankMode('team')" class="px-4 py-2 text-sm font-bold tab-idle">チーム別</button>
+        </div>
+      </div>
+      <div>
+        <label class="block text-xs font-bold mb-1" for="r-year">年度</label>
+        <select id="r-year" class="border rounded px-3 py-2 text-sm"></select>
+      </div>
+      <div>
+        <label class="block text-xs font-bold mb-1" for="r-cat">カテゴリ</label>
+        <select id="r-cat" class="border rounded px-3 py-2 text-sm"></select>
+      </div>
+      <div class="ml-auto text-xs bg-gray-50 border rounded px-3 py-2 leading-5">
+        <span class="font-bold" style="color:var(--court-deep)">ポイント表:</span>
+        優勝 <b>10pt</b> ／ 準優勝 <b>8pt</b> ／ ベスト4 <b>6pt</b> ／ ベスト8 <b>4pt</b> ／ 出場 <b>1pt</b>
+      </div>
+    </div>
+    <div class="bg-white rounded-lg shadow overflow-hidden">
+      <div class="px-4 py-3" style="background:var(--court-deep)">
+        <h2 id="ranking-title" class="font-bold text-sm" style="color:var(--chalk)">選手別 総合ランキング</h2>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="text-left text-xs" style="background:#E4EAE6;color:var(--court-deep)">
+              <th class="px-4 py-2 w-16">順位</th><th class="px-4 py-2">名前</th><th class="px-4 py-2" id="col-team">チーム</th>
+              <th class="px-4 py-2 text-center">優勝</th><th class="px-4 py-2 text-center">出場数</th><th class="px-4 py-2 text-right">合計pt</th>
+            </tr>
+          </thead>
+          <tbody id="ranking-body"></tbody>
+        </table>
+      </div>
+      <p id="ranking-empty" class="hidden px-4 py-8 text-center text-sm text-gray-500">集計対象のデータがありません。</p>
+    </div>
+  </section>
+</main>
+
+<footer class="max-w-6xl mx-auto px-4 pb-8 text-xs text-gray-500">
+  <p>※ 本アプリはバックエンドが生成した <code>data.json</code>（同じフォルダに配置）を自動で読み込みます。見つからない場合は内蔵データで動作します。</p>
+  <details class="mt-2">
+    <summary class="cursor-pointer font-bold" style="color:var(--court-deep)">データ収録状況（出典: 長野県バドミントン協会 nagano-badminton.com）</summary>
+    <div class="mt-2 space-y-1 leading-5">
+      <p><b>収録済（順位が公式PDF/HTMLに明記・2025〜2026年度）:</b> 第77回全信州選手権（5種目）／第45・46回レディースクラブ対抗（各5部）／県リーグ2025前期（男子1〜3部 全順位）・2026前期（男子2部優勝、男子3部全順位）／第25回団体対抗（エレメンタリー男女・マスター男子・ジュニア男女）／第39回レディースダブルス個人戦（4クラスの1〜3位）／第18回やまびこレディースオープン（全16クラス優勝ペア）／第43回全日本レディース県予選（クラブ対抗・都道府県対抗各部優勝）／第28回ジュニアオープン中学生団体（男女・最終順位明記分）。</p>
+      <p><b>未収録（公式PDFがスキャン画像でテキスト無し）:</b> 中学春季選手権（2025・2026）、シニア大会（2025・2026）、全日本レディース県予選2026、県知事杯（選手名が画像埋込）。→ バックエンドにOCR（tesseract.js＋日本語データ）を導入すれば取込可。</p>
+      <p><b>未収録（トーナメント表のみで最終順位の記載なし）:</b> 国スポ予選（少年・成年）、若葉カップ県予選、小学生ABC県予選、秋季小学生大会、プレゴールデンエイジ、県リーグ2025後期・2026前期男子1部（表レイアウト崩れ）。→ 順位を推測せず除外。バックエンドの座標解析（pdf2json）で対応予定。</p>
+      <p>※クラス名の対応が原本レイアウト上特定できない種目は「クラス別」として収録（順位自体は原本の明記どおり）。</p>
+      <p><b>未収録分の全自動取込:</b> バックエンドで <code>npm install &amp;&amp; npm i tesseract.js pdf-to-img</code> のあと <code>npm run auto</code> の1コマンド。一覧PDF・画像PDF（OCR）・トーナメント表（座標解析）を自動判別して data.json 化し、区分（小学生/中学生/社会人）も自動付与。小中学生だけなら <code>node auto.js --only 小中</code>。生成された data.json を上の「data.json読込」で反映。</p>
+    </div>
+  </details>
+  <p class="mt-1">出典: 長野県バドミントン協会「大会予定と結果」（R7・R8年度）掲載の公開結果、および同協会リンクの中信地区協会HP掲載結果。</p>
+</footer>
+
+<script>
+/* ============================== 内蔵データ（実データ） ==============================
+   出典: 長野県バドミントン協会 公開の大会結果PDF（nagano-badminton.com）
+   ※順位が明記された結果のみを収録。トーナメント表のみ・画像形式のPDFは
+     backend での解析（OCR等）が必要なため未収録。 */
+const DUMMY_DATA = [
+  {
+    "year": 2026,
+    "categories": [
+      {
+        "name": "レディース団体1部（こまくさ）",
+        "gender": "女子",
+        "grade": "一般",
+        "players": [
+          {
+            "name": "あっぷるA（長野市）",
+            "team": "",
+            "tournament": "第46回長野県レディースクラブ対抗バドミントン大会",
+            "rank": 1
+          }
+        ]
+      },
+      {
+        "name": "レディース団体2部（りんどう）",
+        "gender": "女子",
+        "grade": "一般",
+        "players": [
+          {
+            "name": "竹馬ひまわりA（上田市）",
+            "team": "",
+            "tournament": "第46回長野県レディースクラブ対抗バドミントン大会",
+            "rank": 1
+          }
+        ]
+      },
+      {
+        "name": "レディース団体3部（なでしこ）",
+        "gender": "女子",
+        "grade": "一般",
+        "players": [
+          {
+            "name": "スカイ（長野市）",
+            "team": "",
+            "tournament": "第46回長野県レディースクラブ対抗バドミントン大会",
+            "rank": 1
+          }
+        ]
+      },
+      {
+        "name": "レディース団体4部（すみれ）",
+        "gender": "女子",
+        "grade": "一般",
+        "players": [
+          {
+            "name": "May Angels（駒ケ根市）",
+            "team": "",
+            "tournament": "第46回長野県レディースクラブ対抗バドミントン大会",
+            "rank": 1
+          }
+        ]
+      },
+      {
+        "name": "レディース団体5部（すずらん）",
+        "gender": "女子",
+        "grade": "一般",
+        "players": [
+          {
+            "name": "OMB（岡谷市）",
+            "team": "",
+            "tournament": "第46回長野県レディースクラブ対抗バドミントン大会",
+            "rank": 1
+          }
+        ]
+      },
+      {
+        "name": "県リーグ男子2部",
+        "gender": "男子",
+        "grade": "一般",
+        "players": [
+          {
+            "name": "上田市バドミントン協会",
+            "team": "",
+            "tournament": "令和8年度長野県バドミントンリーグ（前期）",
+            "rank": 1
+          }
+        ]
+      },
+      {
+        "name": "県リーグ男子3部",
+        "gender": "男子",
+        "grade": "一般",
+        "players": [
+          {
+            "name": "塩尻体協",
+            "team": "",
+            "tournament": "令和8年度長野県バドミントンリーグ（前期）",
+            "rank": 1
+          },
+          {
+            "name": "諏訪市バドミントン協会",
+            "team": "",
+            "tournament": "令和8年度長野県バドミントンリーグ（前期）",
+            "rank": 2
+          },
+          {
+            "name": "Shallow river EX",
+            "team": "",
+            "tournament": "令和8年度長野県バドミントンリーグ（前期）",
+            "rank": 3
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "year": 2025,
+    "categories": [
+      {
+        "name": "一般男子シングルスA",
+        "gender": "男子",
+        "grade": "一般",
+        "players": [
+          {
+            "name": "田口 和樹",
+            "team": "南木曽BC",
+            "tournament": "第77回全信州バドミントン選手権大会",
+            "rank": 1
+          },
+          {
+            "name": "笠松 照栄",
+            "team": "中野フレア",
+            "tournament": "第77回全信州バドミントン選手権大会",
+            "rank": 2
+          },
+          {
+            "name": "小宮山 聖文",
+            "team": "フリー",
+            "tournament": "第77回全信州バドミントン選手権大会",
+            "rank": 3
+          },
+          {
+            "name": "西澤 峻介",
+            "team": "福祉会",
+            "tournament": "第77回全信州バドミントン選手権大会",
+            "rank": 3
+          }
+        ]
+      },
+      {
+        "name": "一般男子シングルスB",
+        "gender": "男子",
+        "grade": "一般",
+        "players": [
+          {
+            "name": "松崎 孝輔",
+            "team": "福祉会",
+            "tournament": "第77回全信州バドミントン選手権大会",
+            "rank": 1
+          },
+          {
+            "name": "中條 雄介",
+            "team": "フリー",
+            "tournament": "第77回全信州バドミントン選手権大会",
+            "rank": 2
+          },
+          {
+            "name": "市川 拓海",
+            "team": "横浜国立大学",
+            "tournament": "第77回全信州バドミントン選手権大会",
+            "rank": 3
+          },
+          {
+            "name": "福島 喜大",
+            "team": "BC諏訪",
+            "tournament": "第77回全信州バドミントン選手権大会",
+            "rank": 3
+          }
+        ]
+      },
+      {
+        "name": "一般女子シングルス",
+        "gender": "女子",
+        "grade": "一般",
+        "players": [
+          {
+            "name": "松田 凛",
+            "team": "南部UNION",
+            "tournament": "第77回全信州バドミントン選手権大会",
+            "rank": 1
+          },
+          {
+            "name": "細井 あさひ",
+            "team": "南部UNION",
+            "tournament": "第77回全信州バドミントン選手権大会",
+            "rank": 2
+          },
+          {
+            "name": "小宮山 せり",
+            "team": "中野フレア",
+            "tournament": "第77回全信州バドミントン選手権大会",
+            "rank": 3
+          },
+          {
+            "name": "戸田 愛理",
+            "team": "南部UNION",
+            "tournament": "第77回全信州バドミントン選手権大会",
+            "rank": 3
+          }
+        ]
+      },
+      {
+        "name": "一般男子ダブルス",
+        "gender": "男子",
+        "grade": "一般",
+        "players": [
+          {
+            "name": "田口 和樹",
+            "team": "南木曽BC",
+            "tournament": "第77回全信州バドミントン選手権大会",
+            "rank": 1
+          },
+          {
+            "name": "小倉 佳悟",
+            "team": "南木曽BC",
+            "tournament": "第77回全信州バドミントン選手権大会",
+            "rank": 1
+          },
+          {
+            "name": "西澤 峻介",
+            "team": "福祉会",
+            "tournament": "第77回全信州バドミントン選手権大会",
+            "rank": 2
+          },
+          {
+            "name": "松崎 孝輔",
+            "team": "福祉会",
+            "tournament": "第77回全信州バドミントン選手権大会",
+            "rank": 2
+          },
+          {
+            "name": "小宮山 聖文",
+            "team": "フリー",
+            "tournament": "第77回全信州バドミントン選手権大会",
+            "rank": 3
+          },
+          {
+            "name": "中條 雄介",
+            "team": "フリー",
+            "tournament": "第77回全信州バドミントン選手権大会",
+            "rank": 3
+          },
+          {
+            "name": "福島 喜大",
+            "team": "BC諏訪",
+            "tournament": "第77回全信州バドミントン選手権大会",
+            "rank": 3
+          },
+          {
+            "name": "ディアン サプトラ",
+            "team": "BC諏訪",
+            "tournament": "第77回全信州バドミントン選手権大会",
+            "rank": 3
+          }
+        ]
+      },
+      {
+        "name": "一般女子ダブルス",
+        "gender": "女子",
+        "grade": "一般",
+        "players": [
+          {
+            "name": "松田 凛",
+            "team": "南部UNION",
+            "tournament": "第77回全信州バドミントン選手権大会",
+            "rank": 1
+          },
+          {
+            "name": "戸田 愛理",
+            "team": "南部UNION",
+            "tournament": "第77回全信州バドミントン選手権大会",
+            "rank": 1
+          },
+          {
+            "name": "内山 桃香",
+            "team": "南部UNION",
+            "tournament": "第77回全信州バドミントン選手権大会",
+            "rank": 2
+          },
+          {
+            "name": "細井 あさひ",
+            "team": "南部UNION",
+            "tournament": "第77回全信州バドミントン選手権大会",
+            "rank": 2
+          },
+          {
+            "name": "佐藤 花帆",
+            "team": "伊那イーストBC",
+            "tournament": "第77回全信州バドミントン選手権大会",
+            "rank": 3
+          },
+          {
+            "name": "山浦 咲星",
+            "team": "伊那イーストBC",
+            "tournament": "第77回全信州バドミントン選手権大会",
+            "rank": 3
+          },
+          {
+            "name": "宮坂 優衣",
+            "team": "長野商業高校",
+            "tournament": "第77回全信州バドミントン選手権大会",
+            "rank": 3
+          },
+          {
+            "name": "内山 優季",
+            "team": "長野商業高校",
+            "tournament": "第77回全信州バドミントン選手権大会",
+            "rank": 3
+          }
+        ]
+      },
+      {
+        "name": "レディース団体1部（こまくさ）",
+        "gender": "女子",
+        "grade": "一般",
+        "players": [
+          {
+            "name": "あっぷるA（長野市）",
+            "team": "",
+            "tournament": "第45回長野県レディースクラブ対抗バドミントン大会",
+            "rank": 1
+          }
+        ]
+      },
+      {
+        "name": "レディース団体2部（りんどう）",
+        "gender": "女子",
+        "grade": "一般",
+        "players": [
+          {
+            "name": "りんどうB（長野市）",
+            "team": "",
+            "tournament": "第45回長野県レディースクラブ対抗バドミントン大会",
+            "rank": 1
+          }
+        ]
+      },
+      {
+        "name": "レディース団体3部（なでしこ）",
+        "gender": "女子",
+        "grade": "一般",
+        "players": [
+          {
+            "name": "あっぷるB（長野市）",
+            "team": "",
+            "tournament": "第45回長野県レディースクラブ対抗バドミントン大会",
+            "rank": 1
+          }
+        ]
+      },
+      {
+        "name": "レディース団体4部（すみれ）",
+        "gender": "女子",
+        "grade": "一般",
+        "players": [
+          {
+            "name": "MYC（長野市）",
+            "team": "",
+            "tournament": "第45回長野県レディースクラブ対抗バドミントン大会",
+            "rank": 1
+          }
+        ]
+      },
+      {
+        "name": "レディース団体5部（すずらん）",
+        "gender": "女子",
+        "grade": "一般",
+        "players": [
+          {
+            "name": "アクティブ（諏訪市）",
+            "team": "",
+            "tournament": "第45回長野県レディースクラブ対抗バドミントン大会",
+            "rank": 1
+          }
+        ]
+      },
+      {
+        "name": "県リーグ男子1部",
+        "gender": "男子",
+        "grade": "一般",
+        "players": [
+          {
+            "name": "Divers",
+            "team": "",
+            "tournament": "令和7年度長野県バドミントンリーグ（前期）",
+            "rank": 1
+          },
+          {
+            "name": "Jack Rose",
+            "team": "",
+            "tournament": "令和7年度長野県バドミントンリーグ（前期）",
+            "rank": 2
+          },
+          {
+            "name": "南木曽BC",
+            "team": "",
+            "tournament": "令和7年度長野県バドミントンリーグ（前期）",
+            "rank": 3
+          },
+          {
+            "name": "飯田BC A",
+            "team": "",
+            "tournament": "令和7年度長野県バドミントンリーグ（前期）",
+            "rank": 4
+          },
+          {
+            "name": "長野商業高等学校",
+            "team": "",
+            "tournament": "令和7年度長野県バドミントンリーグ（前期）",
+            "rank": 5
+          },
+          {
+            "name": "上田市バドミントン協会",
+            "team": "",
+            "tournament": "令和7年度長野県バドミントンリーグ（前期）",
+            "rank": 6
+          }
+        ]
+      },
+      {
+        "name": "県リーグ男子2部",
+        "gender": "男子",
+        "grade": "一般",
+        "players": [
+          {
+            "name": "Jack Rose legend",
+            "team": "",
+            "tournament": "令和7年度長野県バドミントンリーグ（前期）",
+            "rank": 1
+          },
+          {
+            "name": "BC諏訪",
+            "team": "",
+            "tournament": "令和7年度長野県バドミントンリーグ（前期）",
+            "rank": 2
+          },
+          {
+            "name": "桜蕾",
+            "team": "",
+            "tournament": "令和7年度長野県バドミントンリーグ（前期）",
+            "rank": 3
+          },
+          {
+            "name": "Nexus",
+            "team": "",
+            "tournament": "令和7年度長野県バドミントンリーグ（前期）",
+            "rank": 4
+          },
+          {
+            "name": "RallyOne",
+            "team": "",
+            "tournament": "令和7年度長野県バドミントンリーグ（前期）",
+            "rank": 5
+          },
+          {
+            "name": "ザ・シャトルズ",
+            "team": "",
+            "tournament": "令和7年度長野県バドミントンリーグ（前期）",
+            "rank": 6
+          }
+        ]
+      },
+      {
+        "name": "県リーグ男子3部",
+        "gender": "男子",
+        "grade": "一般",
+        "players": [
+          {
+            "name": "塩尻体協",
+            "team": "",
+            "tournament": "令和7年度長野県バドミントンリーグ（前期）",
+            "rank": 1
+          },
+          {
+            "name": "諏訪市バドミントン協会",
+            "team": "",
+            "tournament": "令和7年度長野県バドミントンリーグ（前期）",
+            "rank": 2
+          },
+          {
+            "name": "飯田BC-B",
+            "team": "",
+            "tournament": "令和7年度長野県バドミントンリーグ（前期）",
+            "rank": 3
+          },
+          {
+            "name": "Shallow river EX",
+            "team": "",
+            "tournament": "令和7年度長野県バドミントンリーグ（前期）",
+            "rank": 4
+          }
+        ]
+      },
+      {
+        "name": "エレメンタリー男子団体",
+        "gender": "男子",
+        "grade": "小学生",
+        "players": [
+          {
+            "name": "小布施ジュニア",
+            "team": "",
+            "tournament": "第25回長野県団体対抗バドミントン選手権大会",
+            "rank": 1
+          },
+          {
+            "name": "南信ジュニア",
+            "team": "",
+            "tournament": "第25回長野県団体対抗バドミントン選手権大会",
+            "rank": 2
+          },
+          {
+            "name": "茅野ジュニアバドミントンクラブ",
+            "team": "",
+            "tournament": "第25回長野県団体対抗バドミントン選手権大会",
+            "rank": 3
+          },
+          {
+            "name": "上田バドミントン少年団",
+            "team": "",
+            "tournament": "第25回長野県団体対抗バドミントン選手権大会",
+            "rank": 3
+          }
+        ]
+      },
+      {
+        "name": "エレメンタリー女子団体",
+        "gender": "女子",
+        "grade": "小学生",
+        "players": [
+          {
+            "name": "上田バドミントン少年団A",
+            "team": "",
+            "tournament": "第25回長野県団体対抗バドミントン選手権大会",
+            "rank": 1
+          },
+          {
+            "name": "上田バドミントン少年団B",
+            "team": "",
+            "tournament": "第25回長野県団体対抗バドミントン選手権大会",
+            "rank": 2
+          },
+          {
+            "name": "安曇野ジュニア",
+            "team": "",
+            "tournament": "第25回長野県団体対抗バドミントン選手権大会",
+            "rank": 3
+          },
+          {
+            "name": "松川村ジュニアバドミントンクラブ",
+            "team": "",
+            "tournament": "第25回長野県団体対抗バドミントン選手権大会",
+            "rank": 3
+          }
+        ]
+      },
+      {
+        "name": "マスター男子団体",
+        "gender": "男子",
+        "grade": "一般",
+        "players": [
+          {
+            "name": "五九六参",
+            "team": "",
+            "tournament": "第25回長野県団体対抗バドミントン選手権大会",
+            "rank": 1
+          },
+          {
+            "name": "長野日本無線",
+            "team": "",
+            "tournament": "第25回長野県団体対抗バドミントン選手権大会",
+            "rank": 2
+          }
+        ]
+      },
+      {
+        "name": "ジュニア男子団体",
+        "gender": "男子",
+        "grade": "ジュニア",
+        "players": [
+          {
+            "name": "ASTROBALS",
+            "team": "",
+            "tournament": "第25回長野県団体対抗バドミントン選手権大会（ジュニアの部）",
+            "rank": 1
+          },
+          {
+            "name": "飯田OIDE長姫高校A",
+            "team": "",
+            "tournament": "第25回長野県団体対抗バドミントン選手権大会（ジュニアの部）",
+            "rank": 2
+          },
+          {
+            "name": "飯田OIDE長姫高校C",
+            "team": "",
+            "tournament": "第25回長野県団体対抗バドミントン選手権大会（ジュニアの部）",
+            "rank": 3
+          },
+          {
+            "name": "長野バドミントンスポーツ少年団",
+            "team": "",
+            "tournament": "第25回長野県団体対抗バドミントン選手権大会（ジュニアの部）",
+            "rank": 3
+          }
+        ]
+      },
+      {
+        "name": "ジュニア女子団体",
+        "gender": "女子",
+        "grade": "ジュニア",
+        "players": [
+          {
+            "name": "ASTROBALS",
+            "team": "",
+            "tournament": "第25回長野県団体対抗バドミントン選手権大会（ジュニアの部）",
+            "rank": 1
+          },
+          {
+            "name": "南部UNION",
+            "team": "",
+            "tournament": "第25回長野県団体対抗バドミントン選手権大会（ジュニアの部）",
+            "rank": 2
+          },
+          {
+            "name": "佐久Feathers",
+            "team": "",
+            "tournament": "第25回長野県団体対抗バドミントン選手権大会（ジュニアの部）",
+            "rank": 3
+          },
+          {
+            "name": "松川村ジュニアバドミントンクラブ",
+            "team": "",
+            "tournament": "第25回長野県団体対抗バドミントン選手権大会（ジュニアの部）",
+            "rank": 3
+          }
+        ]
+      },
+      {
+        "name": "女子ダブルス（クラス別）",
+        "gender": "女子",
+        "grade": "一般",
+        "players": [
+          {
+            "name": "加藤 綾香",
+            "team": "竹馬ひまわり（上田市）",
+            "tournament": "第39回長野県レディースバドミントン大会ダブルス個人戦",
+            "rank": 1
+          },
+          {
+            "name": "金子 朱里",
+            "team": "竹馬ひまわり（上田市）",
+            "tournament": "第39回長野県レディースバドミントン大会ダブルス個人戦",
+            "rank": 1
+          },
+          {
+            "name": "上條 実優",
+            "team": "あかしあ（安曇野市）",
+            "tournament": "第39回長野県レディースバドミントン大会ダブルス個人戦",
+            "rank": 2
+          },
+          {
+            "name": "福嶋 くるみ",
+            "team": "あかしあ（安曇野市）",
+            "tournament": "第39回長野県レディースバドミントン大会ダブルス個人戦",
+            "rank": 2
+          },
+          {
+            "name": "福岡 優美",
+            "team": "あかしあ（安曇野市）",
+            "tournament": "第39回長野県レディースバドミントン大会ダブルス個人戦",
+            "rank": 3
+          },
+          {
+            "name": "宮下 真帆",
+            "team": "あかしあ（安曇野市）",
+            "tournament": "第39回長野県レディースバドミントン大会ダブルス個人戦",
+            "rank": 3
+          },
+          {
+            "name": "倉橋 郁恵",
+            "team": "りんどう（長野市）",
+            "tournament": "第39回長野県レディースバドミントン大会ダブルス個人戦",
+            "rank": 1
+          },
+          {
+            "name": "松本 彩花",
+            "team": "りんどう（長野市）",
+            "tournament": "第39回長野県レディースバドミントン大会ダブルス個人戦",
+            "rank": 1
+          },
+          {
+            "name": "佐藤 久美子",
+            "team": "エンデバー（長野市）",
+            "tournament": "第39回長野県レディースバドミントン大会ダブルス個人戦",
+            "rank": 2
+          },
+          {
+            "name": "小林 詩子",
+            "team": "エンデバー（長野市）",
+            "tournament": "第39回長野県レディースバドミントン大会ダブルス個人戦",
+            "rank": 2
+          },
+          {
+            "name": "福澤 ゆか",
+            "team": "あっぷる（長野市）",
+            "tournament": "第39回長野県レディースバドミントン大会ダブルス個人戦",
+            "rank": 3
+          },
+          {
+            "name": "藤巻 美槻",
+            "team": "あっぷる（長野市）",
+            "tournament": "第39回長野県レディースバドミントン大会ダブルス個人戦",
+            "rank": 3
+          },
+          {
+            "name": "常田 和子",
+            "team": "エンジェルス（長野市）",
+            "tournament": "第39回長野県レディースバドミントン大会ダブルス個人戦",
+            "rank": 1
+          },
+          {
+            "name": "小林 範子",
+            "team": "MYC（長野市）",
+            "tournament": "第39回長野県レディースバドミントン大会ダブルス個人戦",
+            "rank": 1
+          },
+          {
+            "name": "小高 圭子",
+            "team": "あかしあ（安曇野市）",
+            "tournament": "第39回長野県レディースバドミントン大会ダブルス個人戦",
+            "rank": 2
+          },
+          {
+            "name": "熊谷 綾子",
+            "team": "あかしあ（安曇野市）",
+            "tournament": "第39回長野県レディースバドミントン大会ダブルス個人戦",
+            "rank": 2
+          },
+          {
+            "name": "大井 克枝",
+            "team": "竹馬ひまわり（上田市）",
+            "tournament": "第39回長野県レディースバドミントン大会ダブルス個人戦",
+            "rank": 3
+          },
+          {
+            "name": "吉池 香里",
+            "team": "竹馬ひまわり（上田市）",
+            "tournament": "第39回長野県レディースバドミントン大会ダブルス個人戦",
+            "rank": 3
+          },
+          {
+            "name": "滝澤 晴美",
+            "team": "りんどう（長野市）",
+            "tournament": "第39回長野県レディースバドミントン大会ダブルス個人戦",
+            "rank": 1
+          },
+          {
+            "name": "有賀 佳代子",
+            "team": "りんどう（長野市）",
+            "tournament": "第39回長野県レディースバドミントン大会ダブルス個人戦",
+            "rank": 1
+          },
+          {
+            "name": "大桃 佳予子",
+            "team": "エンジェルス（長野市）",
+            "tournament": "第39回長野県レディースバドミントン大会ダブルス個人戦",
+            "rank": 2
+          },
+          {
+            "name": "内河 春美",
+            "team": "エンジェルス（長野市）",
+            "tournament": "第39回長野県レディースバドミントン大会ダブルス個人戦",
+            "rank": 2
+          },
+          {
+            "name": "山岸 祐子",
+            "team": "May Angels（駒ケ根市）",
+            "tournament": "第39回長野県レディースバドミントン大会ダブルス個人戦",
+            "rank": 3
+          },
+          {
+            "name": "原 春美",
+            "team": "May Angels（駒ケ根市）",
+            "tournament": "第39回長野県レディースバドミントン大会ダブルス個人戦",
+            "rank": 3
+          },
+          {
+            "name": "酒井 未波",
+            "team": "",
+            "tournament": "第18回やまびこレディースオープンバドミントン大会",
+            "rank": 1
+          },
+          {
+            "name": "宮下 咲乃",
+            "team": "",
+            "tournament": "第18回やまびこレディースオープンバドミントン大会",
+            "rank": 1
+          },
+          {
+            "name": "丹羽 和美",
+            "team": "春日井（愛知県）",
+            "tournament": "第18回やまびこレディースオープンバドミントン大会",
+            "rank": 1
+          },
+          {
+            "name": "高岡 智津子",
+            "team": "東郷（愛知県）",
+            "tournament": "第18回やまびこレディースオープンバドミントン大会",
+            "rank": 1
+          },
+          {
+            "name": "丸山 未有",
+            "team": "エンジェルス（長野市）",
+            "tournament": "第18回やまびこレディースオープンバドミントン大会",
+            "rank": 1
+          },
+          {
+            "name": "北澤 未来",
+            "team": "りんどう（長野市）",
+            "tournament": "第18回やまびこレディースオープンバドミントン大会",
+            "rank": 1
+          },
+          {
+            "name": "小田切 富美子",
+            "team": "エンデバー（長野市）",
+            "tournament": "第18回やまびこレディースオープンバドミントン大会",
+            "rank": 1
+          },
+          {
+            "name": "内河 春美",
+            "team": "エンジェルス（長野市）",
+            "tournament": "第18回やまびこレディースオープンバドミントン大会",
+            "rank": 1
+          },
+          {
+            "name": "大槻 美和",
+            "team": "",
+            "tournament": "第18回やまびこレディースオープンバドミントン大会",
+            "rank": 1
+          },
+          {
+            "name": "下島 史",
+            "team": "",
+            "tournament": "第18回やまびこレディースオープンバドミントン大会",
+            "rank": 1
+          },
+          {
+            "name": "松下 玲子",
+            "team": "ピーナッツ（富山県）",
+            "tournament": "第18回やまびこレディースオープンバドミントン大会",
+            "rank": 1
+          },
+          {
+            "name": "市川 ひろ美",
+            "team": "EASTARS（上田市）",
+            "tournament": "第18回やまびこレディースオープンバドミントン大会",
+            "rank": 1
+          },
+          {
+            "name": "住野 藍",
+            "team": "",
+            "tournament": "第18回やまびこレディースオープンバドミントン大会",
+            "rank": 1
+          },
+          {
+            "name": "雨宮 歌純",
+            "team": "",
+            "tournament": "第18回やまびこレディースオープンバドミントン大会",
+            "rank": 1
+          },
+          {
+            "name": "穂坂 好美",
+            "team": "",
+            "tournament": "第18回やまびこレディースオープンバドミントン大会",
+            "rank": 1
+          },
+          {
+            "name": "佐野 ゆう子",
+            "team": "",
+            "tournament": "第18回やまびこレディースオープンバドミントン大会",
+            "rank": 1
+          },
+          {
+            "name": "石川 雅美",
+            "team": "エンデバー（長野市）",
+            "tournament": "第18回やまびこレディースオープンバドミントン大会",
+            "rank": 1
+          },
+          {
+            "name": "保科 美晴",
+            "team": "あっぷる（長野市）",
+            "tournament": "第18回やまびこレディースオープンバドミントン大会",
+            "rank": 1
+          },
+          {
+            "name": "長岡 恭子",
+            "team": "八尾レディース（富山県）",
+            "tournament": "第18回やまびこレディースオープンバドミントン大会",
+            "rank": 1
+          },
+          {
+            "name": "戸田 清美",
+            "team": "上市レディース（富山県）",
+            "tournament": "第18回やまびこレディースオープンバドミントン大会",
+            "rank": 1
+          },
+          {
+            "name": "渡辺 陽子",
+            "team": "",
+            "tournament": "第18回やまびこレディースオープンバドミントン大会",
+            "rank": 1
+          },
+          {
+            "name": "中沢 雅子",
+            "team": "",
+            "tournament": "第18回やまびこレディースオープンバドミントン大会",
+            "rank": 1
+          },
+          {
+            "name": "江口 悦子",
+            "team": "MYC（長野市）",
+            "tournament": "第18回やまびこレディースオープンバドミントン大会",
+            "rank": 1
+          },
+          {
+            "name": "大塚 真理",
+            "team": "りんどう（長野市）",
+            "tournament": "第18回やまびこレディースオープンバドミントン大会",
+            "rank": 1
+          },
+          {
+            "name": "小林 詩子",
+            "team": "",
+            "tournament": "第18回やまびこレディースオープンバドミントン大会",
+            "rank": 1
+          },
+          {
+            "name": "佐藤 久美子",
+            "team": "",
+            "tournament": "第18回やまびこレディースオープンバドミントン大会",
+            "rank": 1
+          },
+          {
+            "name": "松岡 泉",
+            "team": "",
+            "tournament": "第18回やまびこレディースオープンバドミントン大会",
+            "rank": 1
+          },
+          {
+            "name": "村重 美奈子",
+            "team": "",
+            "tournament": "第18回やまびこレディースオープンバドミントン大会",
+            "rank": 1
+          },
+          {
+            "name": "荒川 美佐子",
+            "team": "",
+            "tournament": "第18回やまびこレディースオープンバドミントン大会",
+            "rank": 1
+          },
+          {
+            "name": "鈴木 恵美",
+            "team": "",
+            "tournament": "第18回やまびこレディースオープンバドミントン大会",
+            "rank": 1
+          },
+          {
+            "name": "常田 和子",
+            "team": "エンジェルス（長野市）",
+            "tournament": "第18回やまびこレディースオープンバドミントン大会",
+            "rank": 1
+          },
+          {
+            "name": "小林 範子",
+            "team": "MYC（長野市）",
+            "tournament": "第18回やまびこレディースオープンバドミントン大会",
+            "rank": 1
+          }
+        ]
+      },
+      {
+        "name": "クラブ対抗の部",
+        "gender": "女子",
+        "grade": "一般",
+        "players": [
+          {
+            "name": "りんどう（長野市）",
+            "team": "",
+            "tournament": "第43回全日本レディースバドミントン選手権大会長野県予選会",
+            "rank": 1
+          }
+        ]
+      },
+      {
+        "name": "都道府県対抗の部（フリー・40代・50代）",
+        "gender": "女子",
+        "grade": "一般",
+        "players": [
+          {
+            "name": "宮下 咲乃",
+            "team": "May Angels（駒ケ根市）",
+            "tournament": "第43回全日本レディースバドミントン選手権大会長野県予選会",
+            "rank": 1
+          },
+          {
+            "name": "酒井 未波",
+            "team": "May Angels（駒ケ根市）",
+            "tournament": "第43回全日本レディースバドミントン選手権大会長野県予選会",
+            "rank": 1
+          },
+          {
+            "name": "石川 雅美",
+            "team": "エンデバー（長野市）",
+            "tournament": "第43回全日本レディースバドミントン選手権大会長野県予選会",
+            "rank": 1
+          },
+          {
+            "name": "保科 美晴",
+            "team": "あっぷる（長野市）",
+            "tournament": "第43回全日本レディースバドミントン選手権大会長野県予選会",
+            "rank": 1
+          },
+          {
+            "name": "横山 祥子",
+            "team": "りんどう（長野市）",
+            "tournament": "第43回全日本レディースバドミントン選手権大会長野県予選会",
+            "rank": 1
+          },
+          {
+            "name": "樋口 美恵子",
+            "team": "エンデバー（長野市）",
+            "tournament": "第43回全日本レディースバドミントン選手権大会長野県予選会",
+            "rank": 1
+          }
+        ]
+      },
+      {
+        "name": "中学男子団体",
+        "gender": "男子",
+        "grade": "中学",
+        "players": [
+          {
+            "name": "中野フレアBC",
+            "team": "",
+            "tournament": "第28回長野県ジュニアオープンバドミントン大会（中学生）",
+            "rank": 1
+          },
+          {
+            "name": "山室中部スポ少（富山県）",
+            "team": "",
+            "tournament": "第28回長野県ジュニアオープンバドミントン大会（中学生）",
+            "rank": 2
+          },
+          {
+            "name": "ASTROBALS",
+            "team": "",
+            "tournament": "第28回長野県ジュニアオープンバドミントン大会（中学生）",
+            "rank": 3
+          },
+          {
+            "name": "パルセイロユース",
+            "team": "",
+            "tournament": "第28回長野県ジュニアオープンバドミントン大会（中学生）",
+            "rank": 3
+          }
+        ]
+      },
+      {
+        "name": "中学女子団体",
+        "gender": "女子",
+        "grade": "中学",
+        "players": [
+          {
+            "name": "ASTROBALS",
+            "team": "",
+            "tournament": "第28回長野県ジュニアオープンバドミントン大会（中学生）",
+            "rank": 1
+          },
+          {
+            "name": "伊那イーストBC",
+            "team": "",
+            "tournament": "第28回長野県ジュニアオープンバドミントン大会（中学生）",
+            "rank": 2
+          },
+          {
+            "name": "ミンピーベーサー",
+            "team": "",
+            "tournament": "第28回長野県ジュニアオープンバドミントン大会（中学生）",
+            "rank": 3
+          },
+          {
+            "name": "松川町Jr",
+            "team": "",
+            "tournament": "第28回長野県ジュニアオープンバドミントン大会（中学生）",
+            "rank": 3
+          }
+        ]
+      }
+    ]
+  }
+];
+
+/* ============================== ポイント計算 ============================== */
+const POINT_TABLE = [
+  { max: 1, pts: 10, label: "優勝"   },
+  { max: 2, pts: 8,  label: "準優勝" },
+  { max: 4, pts: 6,  label: "ベスト4" },
+  { max: 8, pts: 4,  label: "ベスト8" },
+  { max: Infinity, pts: 1, label: "出場" }
+];
+const pointsFor = (rank) => POINT_TABLE.find(t => rank <= t.max).pts;
+const rankLabel = (rank) => rank === 1 ? "優勝" : rank === 2 ? "準優勝" : rank === 3 ? "第3位" : rank === 4 ? "ベスト4" : rank <= 8 ? "ベスト8" : `${rank}位相当`;
+
+/* ============================== 状態・データ読込 ============================== */
+let DATA = DUMMY_DATA;
+let rankMode = "player";
+
+// バックエンド生成の data.json があれば差し替え（プレビュー時は失敗して問題なし）
+fetch("./data.json")
+  .then(r => r.ok ? r.json() : Promise.reject())
+  .then(json => {
+    if (Array.isArray(json) && json.length) {
+      DATA = json;
+      document.getElementById("data-source").textContent = "データ: data.json";
+      init();
+    }
+  })
+  .catch(() => {});
+
+/* ============================== 区分（部門） ============================== */
+let DIVISION = "小中学生"; // 既定: 小中学生メイン
+let PREF = "";              // 都道府県フィルタ（空=全国）
+
+function divisionOf(category, grade, tournament) {
+  const s = `${category}｜${grade || ""}｜${tournament || ""}`;
+  if (/(中学|中\d|ジュニアオープン)/.test(s)) return "中学生";
+  if (/(小学|エレメンタリー|学年別|若葉|ＡＢＣ|ABC|プレゴールデン|スポ少)/.test(s)) return "小学生";
+  if (/(高校|少年|高\d|インターハイ|高等学校)/.test(s)) return "高校生";
+  if (/(一般|社会人|レディース|マスター|シニア|実業団|県リーグ|クラブ対抗|都道府県対抗|全信州)/.test(s)) return "社会人";
+  return "その他";
+}
+function matchDivision(div) {
+  if (!DIVISION) return true;
+  if (DIVISION === "小中学生") return div === "小学生" || div === "中学生";
+  return div === DIVISION;
+}
+document.querySelectorAll(".div-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    DIVISION = btn.dataset.div;
+    document.querySelectorAll(".div-btn").forEach(b => b.className = b.className.replace("tab-active", "tab-idle"));
+    btn.className = btn.className.replace("tab-idle", "tab-active");
+    init();
+  });
+});
+
+/* ============================== 整形ユーティリティ ============================== */
+function flatten(data) {
+  const rows = [];
+  data.forEach(y => (y.categories || []).forEach(c => {
+    const div = c.division || divisionOf(c.name, c.grade, (c.players[0] || {}).tournament);
+    const pref = c.pref || "長野県";
+    if (!matchDivision(div)) return;
+    if (PREF && pref !== PREF) return;
+    (c.players || []).forEach((p, i) => {
+      rows.push({
+        year: y.year, category: c.name, gender: c.gender || "", grade: c.grade || "",
+        division: div, pref,
+        rank: p.rank || (i + 1), name: p.name, team: p.team || "", tournament: p.tournament || ""
+      });
+    });
+  }));
+  return rows;
+}
+const uniq = (arr) => [...new Set(arr)];
+const esc = (s) => String(s).replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;" }[c]));
+
+function rankBadge(rank) {
+  const cls = rank === 1 ? "rank-1" : rank === 2 ? "rank-2" : rank <= 4 ? "rank-3" : "rank-n";
+  return `<span class="num inline-block min-w-[3.5rem] text-center px-2 py-0.5 rounded font-bold ${cls}" title="${rankLabel(rank)}">${rankLabel(rank)}</span>`;
+}
+
+function fillSelect(el, values, allLabel) {
+  el.innerHTML = `<option value="">${allLabel}</option>` + values.map(v => `<option value="${esc(v)}">${esc(v)}</option>`).join("");
+}
+
+/* ============================== 検索タブ ============================== */
+function currentSearchRows() {
+  const q = document.getElementById("q").value.trim().toLowerCase();
+  const fy = document.getElementById("f-year").value;
+  const fc = document.getElementById("f-cat").value;
+  return flatten(DATA).filter(r => {
+    if (fy && String(r.year) !== fy) return false;
+    if (fc && r.category !== fc) return false;
+    if (!q) return true;
+    return [r.name, r.team, r.tournament].some(v => v.toLowerCase().includes(q));
+  }).sort((a, b) => b.year - a.year || a.category.localeCompare(b.category, "ja") || a.rank - b.rank);
+}
+
+function renderSearch() {
+  const rows = currentSearchRows();
+  document.getElementById("search-count").textContent = rows.length ? `${rows.length}件` : "";
+  document.getElementById("search-empty").classList.toggle("hidden", rows.length > 0);
+  document.getElementById("search-body").innerHTML = rows.map(r => `
+    <tr class="border-t">
+      <td class="px-4 py-2 num font-bold">${r.year}</td>
+      <td class="px-4 py-2 text-xs text-gray-500">${esc(r.pref)}</td>
+      <td class="px-4 py-2">${esc(r.tournament)}</td>
+      <td class="px-4 py-2">${esc(r.category)}</td>
+      <td class="px-4 py-2">${rankBadge(r.rank)}</td>
+      <td class="px-4 py-2 font-bold">${esc(r.name)}</td>
+      <td class="px-4 py-2">${esc(r.team)}</td>
+      <td class="px-4 py-2 num text-right font-bold" style="color:var(--court)">${pointsFor(r.rank)}</td>
+    </tr>`).join("");
+}
+
+/* ============================== 年度・カテゴリ別タブ ============================== */
+function renderBrowse() {
+  const by = document.getElementById("b-year").value;
+  const bg = document.getElementById("b-gender").value;
+  const area = document.getElementById("browse-area");
+  area.innerHTML = "";
+
+  DATA.filter(y => !by || String(y.year) === by).forEach(y => {
+    const cats = (y.categories || []).filter(c => {
+      const div = c.division || divisionOf(c.name, c.grade, (c.players[0] || {}).tournament);
+      const pref = c.pref || "長野県";
+      return matchDivision(div) && (!PREF || pref === PREF) && (!bg || c.gender === bg);
+    });
+    if (!cats.length) return;
+    const catsHtml = cats.map(c => {
+      const players = [...c.players].map((p, i) => ({ ...p, rank: p.rank || (i + 1) })).sort((a, b) => a.rank - b.rank);
+      return `
+        <div class="border rounded-lg overflow-hidden">
+          <div class="px-3 py-2 text-sm font-bold flex justify-between" style="background:#E4EAE6;color:var(--court-deep)">
+            <span>${esc(c.name)}</span><span class="text-xs font-normal">${esc(c.gender || "")}・${esc(c.grade || "")}</span>
+          </div>
+          <table class="w-full text-sm">
+            <tbody>${players.map(p => `
+              <tr class="border-t">
+                <td class="px-3 py-1.5 w-24">${rankBadge(p.rank)}</td>
+                <td class="px-3 py-1.5 font-bold">${esc(p.name)}</td>
+                <td class="px-3 py-1.5 text-gray-600">${esc(p.team)}</td>
+                <td class="px-3 py-1.5 text-gray-500 text-xs">${esc(p.tournament)}</td>
+              </tr>`).join("")}
+            </tbody>
+          </table>
+        </div>`;
+    }).join("");
+
+    area.insertAdjacentHTML("beforeend", `
+      <div class="bg-white rounded-lg shadow p-4">
+        <h3 class="num text-2xl font-bold mb-3" style="color:var(--court-deep)">${y.year}<span class="text-sm font-normal ml-1">年度</span></h3>
+        <div class="grid gap-4 md:grid-cols-2">${catsHtml}</div>
+      </div>`);
+  });
+
+  if (!area.innerHTML) area.innerHTML = `<p class="text-center text-sm text-gray-500 py-8">該当データがありません。</p>`;
+}
+
+/* ============================== ランキングタブ ============================== */
+function setRankMode(mode) {
+  rankMode = mode;
+  document.getElementById("rk-player").className = "px-4 py-2 text-sm font-bold " + (mode === "player" ? "tab-active" : "tab-idle");
+  document.getElementById("rk-team").className   = "px-4 py-2 text-sm font-bold " + (mode === "team"   ? "tab-active" : "tab-idle");
+  renderRanking();
+}
+
+function renderRanking() {
+  const ry = document.getElementById("r-year").value;
+  const rc = document.getElementById("r-cat").value;
+  const filtered = flatten(DATA).filter(r => (!ry || String(r.year) === ry) && (!rc || r.category === rc));
+  const map = new Map();
+  for (const r of filtered) {
+    const key = rankMode === "player" ? `${r.name}｜${r.team}` : (r.team || r.name);
+    if (!key) continue;
+    if (!map.has(key)) map.set(key, { name: rankMode === "player" ? r.name : r.team, team: r.team, pts: 0, wins: 0, entries: 0 });
+    const e = map.get(key);
+    e.pts += pointsFor(r.rank);
+    e.entries += 1;
+    if (r.rank === 1) e.wins += 1;
+  }
+
+  const list = [...map.values()].sort((a, b) => b.pts - a.pts || b.wins - a.wins || b.entries - a.entries);
+  document.getElementById("ranking-title").textContent = (rankMode === "player" ? "選手別" : "チーム別") + " 総合ランキング" + (ry ? `（${ry}年度）` : "（全年度）") + (rc ? ` / ${rc}` : "");
+  document.getElementById("col-team").style.display = rankMode === "player" ? "" : "none";
+  document.getElementById("ranking-empty").classList.toggle("hidden", list.length > 0);
+
+  document.getElementById("ranking-body").innerHTML = list.map((e, i) => `
+    <tr class="border-t">
+      <td class="px-4 py-2"><span class="num inline-block w-10 text-center py-0.5 rounded font-bold text-lg ${i===0?"rank-1":i===1?"rank-2":i===2?"rank-3":"rank-n"}">${i + 1}</span></td>
+      <td class="px-4 py-2 font-bold">${esc(e.name)}</td>
+      <td class="px-4 py-2 text-gray-600" style="display:${rankMode === "player" ? "" : "none"}">${esc(e.team)}</td>
+      <td class="px-4 py-2 num text-center font-bold" style="color:var(--shuttle);text-shadow:0 0 0 var(--court-deep)">${e.wins}</td>
+      <td class="px-4 py-2 num text-center">${e.entries}</td>
+      <td class="px-4 py-2 num text-right text-lg font-bold" style="color:var(--court)">${e.pts}</td>
+    </tr>`).join("");
+}
+
+/* ============================== タブ切替・DL・初期化 ============================== */
+document.querySelectorAll(".tab-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".tab-btn").forEach(b => b.className = b.className.replace("tab-active", "tab-idle"));
+    btn.className = btn.className.replace("tab-idle", "tab-active");
+    document.querySelectorAll(".tab-panel").forEach(p => p.classList.add("hidden"));
+    document.getElementById("tab-" + btn.dataset.tab).classList.remove("hidden");
+  });
+});
+
+function exportCsv() {
+  const rows = currentSearchRows();
+  const head = ["年度","県","大会","カテゴリ","順位","選手/チーム","所属","獲得pt"];
+  const csv = [head].concat(rows.map(r => [r.year, r.pref, r.tournament, r.category, rankLabel(r.rank), r.name, r.team, pointsFor(r.rank)]))
+    .map(a => a.map(v => `"${String(v).replace(/"/g, '""')}"`).join(",")).join("\r\n");
+  const blob = new Blob(["\uFEFF" + csv], { type: "text/csv;charset=utf-8" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob); a.download = "badminton-results.csv";
+  document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(a.href);
+}
+
+function importDataFile(file) {
+  const fr = new FileReader();
+  fr.onload = () => {
+    try {
+      const json = JSON.parse(fr.result);
+      if (!Array.isArray(json) || !json.length || !json[0].categories) throw new Error("形式不正");
+      DATA = json;
+      document.getElementById("data-source").textContent = "データ: " + file.name;
+      init();
+    } catch (e) { alert("data.jsonの形式が不正: " + e.message); }
+  };
+  fr.readAsText(file, "utf-8");
+}
+
+function downloadApp() {
+  const html = "<!DOCTYPE html>\n" + document.documentElement.outerHTML;
+  const blob = new Blob([html], { type: "text/html;charset=utf-8" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "badminton-ranking-app.html";
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(a.href);
+}
+
+function initPrefSelect() {
+  const prefs = new Set();
+  DATA.forEach(y => (y.categories || []).forEach(c => prefs.add(c.pref || "長野県")));
+  const el = document.getElementById("f-pref");
+  const cur = PREF;
+  el.innerHTML = '<option value="">全国（すべての都道府県）</option>' +
+    [...prefs].sort((a,b)=>a.localeCompare(b,"ja")).map(p => `<option value="${esc(p)}" ${p===cur?"selected":""}>${esc(p)}</option>`).join("");
+}
+
+function init() {
+  initPrefSelect();
+  const rows = flatten(DATA);
+  const years = uniq(rows.map(r => r.year)).sort((a, b) => b - a).map(String);
+  const cats  = uniq(rows.map(r => r.category)).sort((a, b) => a.localeCompare(b, "ja"));
+
+  fillSelect(document.getElementById("f-year"), years, "すべての年度");
+  fillSelect(document.getElementById("f-cat"),  cats,  "すべてのカテゴリ");
+  fillSelect(document.getElementById("b-year"), years, "すべての年度");
+  fillSelect(document.getElementById("r-year"), years, "すべての年度");
+  fillSelect(document.getElementById("r-cat"),  cats,  "すべてのカテゴリ");
+
+  ["q","f-year","f-cat"].forEach(id => document.getElementById(id).addEventListener("input", renderSearch));
+  ["b-year","b-gender"].forEach(id => document.getElementById(id).addEventListener("input", renderBrowse));
+  ["r-year","r-cat"].forEach(id => document.getElementById(id).addEventListener("input", renderRanking));
+
+  renderSearch();
+  renderBrowse();
+  renderRanking();
+}
+document.getElementById("f-pref").addEventListener("change", e => { PREF = e.target.value; init(); });
+document.getElementById("file-import").addEventListener("change", e => {
+  if (e.target.files[0]) importDataFile(e.target.files[0]);
+  e.target.value = "";
+});
+init();
+</script>
+</body>
+</html>
