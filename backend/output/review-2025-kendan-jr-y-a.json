@@ -1,0 +1,14 @@
+{
+  "_note": "champions/third を目視確認し、確定した順位を players[].rank に反映してから index.js --import で取込むこと。ダブルスは優勝ペア2名が champions に並ぶ。",
+  "year": 2026,
+  "tournament": "8競技方法予選リーグ、決勝トーナメント（申込み数により変更あり）",
+  "categories": [
+    {
+      "name": "団体編成",
+      "gender": "不明",
+      "grade": "一般",
+      "players": []
+    }
+  ],
+  "_warnings": []
+}

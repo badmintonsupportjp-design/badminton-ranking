@@ -1,0 +1,178 @@
+{
+  "_note": "champions/third を目視確認し、確定した順位を players[].rank に反映してから index.js --import で取込むこと。ダブルスは優勝ペア2名が champions に並ぶ。",
+  "year": 2026,
+  "tournament": "chugoku.pdf",
+  "categories": [
+    {
+      "name": "６年生以下男子シングルス",
+      "gender": "男子",
+      "grade": "一般",
+      "players": []
+    },
+    {
+      "name": "５年生以下男子シングルス",
+      "gender": "男子",
+      "grade": "一般",
+      "players": [
+        {
+          "name": "陽斗",
+          "team": "山口県",
+          "tournament": "chugoku.pdf",
+          "rank": 3,
+          "_evidence": "三位決定戦勝者"
+        }
+      ]
+    },
+    {
+      "name": "５年生以下男子シングルス",
+      "gender": "男子",
+      "grade": "一般",
+      "players": [
+        {
+          "name": "山本",
+          "team": "山口県",
+          "tournament": "chugoku.pdf",
+          "rank": 3,
+          "_evidence": "三位決定戦勝者"
+        }
+      ]
+    },
+    {
+      "name": "４年生以下男子シングルス",
+      "gender": "男子",
+      "grade": "一般",
+      "players": []
+    },
+    {
+      "name": "６年生以下女子シングルス",
+      "gender": "女子",
+      "grade": "一般",
+      "players": []
+    },
+    {
+      "name": "６年生以下女子シングルス",
+      "gender": "女子",
+      "grade": "一般",
+      "players": [
+        {
+          "name": "山根",
+          "team": "山口県",
+          "tournament": "chugoku.pdf",
+          "rank": 3,
+          "_evidence": "三位決定戦勝者"
+        }
+      ]
+    },
+    {
+      "name": "５年生以下女子シングルス",
+      "gender": "女子",
+      "grade": "一般",
+      "players": []
+    },
+    {
+      "name": "４年生以下女子シングルス",
+      "gender": "女子",
+      "grade": "一般",
+      "players": []
+    },
+    {
+      "name": "４年生以下女子シングルス",
+      "gender": "女子",
+      "grade": "一般",
+      "players": [
+        {
+          "name": "福間",
+          "team": "山口県",
+          "tournament": "chugoku.pdf",
+          "rank": 3,
+          "_evidence": "三位決定戦勝者"
+        }
+      ]
+    },
+    {
+      "name": "６年生以下男子ダブルス",
+      "gender": "男子",
+      "grade": "一般",
+      "players": []
+    },
+    {
+      "name": "５年生以下男子ダブルス",
+      "gender": "男子",
+      "grade": "一般",
+      "players": []
+    },
+    {
+      "name": "５年生以下男子ダブルス",
+      "gender": "男子",
+      "grade": "一般",
+      "players": [
+        {
+          "name": "長谷川",
+          "team": "5BD",
+          "tournament": "chugoku.pdf",
+          "rank": 3,
+          "_evidence": "三位決定戦勝者"
+        }
+      ]
+    },
+    {
+      "name": "４年生以下男子ダブルス",
+      "gender": "男子",
+      "grade": "一般",
+      "players": []
+    },
+    {
+      "name": "６年生以下女子ダブルス",
+      "gender": "女子",
+      "grade": "一般",
+      "players": [
+        {
+          "name": "松尾",
+          "team": "6GD",
+          "tournament": "chugoku.pdf",
+          "rank": 3,
+          "_evidence": "三位決定戦勝者"
+        }
+      ]
+    },
+    {
+      "name": "６年生以下女子ダブルス",
+      "gender": "女子",
+      "grade": "一般",
+      "players": []
+    },
+    {
+      "name": "５年生以下女子ダブルス",
+      "gender": "女子",
+      "grade": "一般",
+      "players": []
+    },
+    {
+      "name": "４年生以下女子ダブルス",
+      "gender": "女子",
+      "grade": "一般",
+      "players": []
+    },
+    {
+      "name": "４年生以下女子ダブルス",
+      "gender": "女子",
+      "grade": "一般",
+      "players": [
+        {
+          "name": "湯原",
+          "team": "4GD",
+          "tournament": "chugoku.pdf",
+          "rank": 3,
+          "_evidence": "三位決定戦勝者"
+        }
+      ]
+    }
+  ],
+  "_warnings": [
+    "三位決定戦マーカー(y=-0.8)の勝者名を特定できず",
+    "三位決定戦マーカー(y=-0.8)の勝者名を特定できず",
+    "三位決定戦マーカー(y=-0.8)の勝者名を特定できず",
+    "三位決定戦マーカー(y=-0.8)の勝者名を特定できず",
+    "三位決定戦マーカー(y=-0.8)の勝者名を特定できず"
+  ]
+}

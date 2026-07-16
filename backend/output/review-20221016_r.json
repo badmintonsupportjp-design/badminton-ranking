@@ -1,0 +1,7 @@
+{
+  "_note": "champions/third を目視確認し、確定した順位を players[].rank に反映してから index.js --import で取込むこと。ダブルスは優勝ペア2名が champions に並ぶ。",
+  "year": 2022,
+  "tournament": "令和4年度（第36回）市民総合スポーツ大会バドミントン競技区対抗団体戦兼春日市バドミントン協会",
+  "categories": [],
+  "_warnings": []
+}

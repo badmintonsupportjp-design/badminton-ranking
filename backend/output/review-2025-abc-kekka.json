@@ -1,0 +1,58 @@
+{
+  "_note": "champions/third を目視確認し、確定した順位を players[].rank に反映してから index.js --import で取込むこと。ダブルスは優勝ペア2名が champions に並ぶ。",
+  "year": 2026,
+  "tournament": "2025-abc-kekka.pdf",
+  "categories": [
+    {
+      "name": "Ａ男子シングルス",
+      "gender": "男子",
+      "grade": "一般",
+      "players": []
+    },
+    {
+      "name": "Ａ女子シングルス",
+      "gender": "女子",
+      "grade": "一般",
+      "players": []
+    },
+    {
+      "name": "Ｂ男子シングルス",
+      "gender": "男子",
+      "grade": "一般",
+      "players": []
+    },
+    {
+      "name": "Ｂ女子シングルス",
+      "gender": "女子",
+      "grade": "一般",
+      "players": []
+    },
+    {
+      "name": "Ｃ女子シングルス",
+      "gender": "女子",
+      "grade": "一般",
+      "players": [
+        {
+          "name": "篠原",
+          "team": "高山Ｖ",
+          "tournament": "2025-abc-kekka.pdf",
+          "rank": 3,
+          "_evidence": "三位決定戦勝者"
+        },
+        {
+          "name": "篠原",
+          "team": "高山Ｖ",
+          "tournament": "2025-abc-kekka.pdf",
+          "rank": 3,
+          "_evidence": "三位決定戦勝者"
+        }
+      ]
+    }
+  ],
+  "_warnings": [
+    "三位決定戦マーカー(y=51.9)の勝者名を特定できず",
+    "三位決定戦マーカー(y=51.9)の勝者名を特定できず",
+    "三位決定戦マーカー(y=51.9)の勝者名を特定できず",
+    "三位決定戦マーカー(y=51.9)の勝者名を特定できず"
+  ]
+}

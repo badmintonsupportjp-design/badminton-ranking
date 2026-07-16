@@ -1,0 +1,14 @@
+{
+  "_note": "champions/third を目視確認し、確定した順位を players[].rank に反映してから index.js --import で取込むこと。ダブルスは優勝ペア2名が champions に並ぶ。",
+  "year": 2026,
+  "tournament": "新日本製薬 Perfect One Cup 第61回福岡市民春季バドミントン大会",
+  "categories": [
+    {
+      "name": "不明",
+      "gender": "不明",
+      "grade": "一般",
+      "players": []
+    }
+  ],
+  "_warnings": []
+}

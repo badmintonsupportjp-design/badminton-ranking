@@ -1,0 +1,81 @@
+{
+  "_note": "champions/third を目視確認し、確定した順位を players[].rank に反映してから index.js --import で取込むこと。ダブルスは優勝ペア2名が champions に並ぶ。",
+  "year": 2026,
+  "tournament": "第26回全日本中学生バドミントン選手権大会福岡市予選会",
+  "categories": [
+    {
+      "name": "不明",
+      "gender": "不明",
+      "grade": "一般",
+      "players": []
+    },
+    {
+      "name": "中学男子シングルス－１／２",
+      "gender": "男子",
+      "grade": "中学",
+      "players": []
+    },
+    {
+      "name": "中学男子シングルス－２／２",
+      "gender": "男子",
+      "grade": "中学",
+      "players": []
+    },
+    {
+      "name": "中学女子シングルス－１／２",
+      "gender": "女子",
+      "grade": "中学",
+      "players": []
+    },
+    {
+      "name": "中学女子シングルス－２／２",
+      "gender": "女子",
+      "grade": "中学",
+      "players": [
+        {
+          "name": "紗那",
+          "team": "城南中",
+          "tournament": "第26回全日本中学生バドミントン選手権大会福岡市予選会",
+          "rank": 3,
+          "_evidence": "三位決定戦勝者"
+        }
+      ]
+    },
+    {
+      "name": "中学男子ダブルス－１／２",
+      "gender": "男子",
+      "grade": "中学",
+      "players": []
+    },
+    {
+      "name": "中学男子ダブルス－２／２",
+      "gender": "男子",
+      "grade": "中学",
+      "players": []
+    },
+    {
+      "name": "中学女子ダブルス－１／２",
+      "gender": "女子",
+      "grade": "中学",
+      "players": []
+    },
+    {
+      "name": "中学女子ダブルス－２／２",
+      "gender": "女子",
+      "grade": "中学",
+      "players": [
+        {
+          "name": "愛奈",
+          "team": "照葉中",
+          "tournament": "第26回全日本中学生バドミントン選手権大会福岡市予選会",
+          "rank": 3,
+          "_evidence": "三位決定戦勝者"
+        }
+      ]
+    }
+  ],
+  "_warnings": [
+    "三位決定戦マーカー(y=-0.8)の勝者名を特定できず",
+    "三位決定戦マーカー(y=-0.8)の勝者名を特定できず"
+  ]
+}

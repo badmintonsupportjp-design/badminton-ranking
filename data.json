@@ -1,0 +1,1346 @@
+[
+  {
+    "year": 2026,
+    "categories": [
+      {
+        "name": "６年生以下男子シングルス",
+        "gender": "男子",
+        "grade": "一般",
+        "players": [
+          {
+            "name": "大平",
+            "team": "久松台",
+            "tournament": "hiroshima.pdf",
+            "rank": 3
+          }
+        ]
+      },
+      {
+        "name": "年生以下男子シングルス",
+        "gender": "男子",
+        "grade": "一般",
+        "players": [
+          {
+            "name": "上杉",
+            "team": "久松台",
+            "tournament": "hiroshima.pdf",
+            "rank": 3
+          }
+        ]
+      },
+      {
+        "name": "６年生以下女子シングルス",
+        "gender": "女子",
+        "grade": "一般",
+        "players": [
+          {
+            "name": "芳野",
+            "team": "久松台",
+            "tournament": "hiroshima.pdf",
+            "rank": 3
+          },
+          {
+            "name": "山根",
+            "team": "山口県",
+            "tournament": "chugoku.pdf",
+            "rank": 3
+          }
+        ]
+      },
+      {
+        "name": "４年生以下女子シングルス",
+        "gender": "女子",
+        "grade": "一般",
+        "players": [
+          {
+            "name": "大城",
+            "team": "久松台",
+            "tournament": "hiroshima.pdf",
+            "rank": 3
+          },
+          {
+            "name": "福間",
+            "team": "山口県",
+            "tournament": "chugoku.pdf",
+            "rank": 3
+          }
+        ]
+      },
+      {
+        "name": "年生以下男子ダブルス",
+        "gender": "男子",
+        "grade": "一般",
+        "players": [
+          {
+            "name": "藤原",
+            "team": "広島安佐",
+            "tournament": "hiroshima.pdf",
+            "rank": 3
+          }
+        ]
+      },
+      {
+        "name": "５年生以下男子ダブルス",
+        "gender": "男子",
+        "grade": "一般",
+        "players": [
+          {
+            "name": "町野",
+            "team": "広島安佐",
+            "tournament": "hiroshima.pdf",
+            "rank": 3
+          },
+          {
+            "name": "長谷川",
+            "team": "5BD",
+            "tournament": "chugoku.pdf",
+            "rank": 3
+          }
+        ]
+      },
+      {
+        "name": "６年生以下女子ダブルス",
+        "gender": "女子",
+        "grade": "一般",
+        "players": [
+          {
+            "name": "左右田",
+            "team": "東野ＳＢＣ",
+            "tournament": "hiroshima.pdf",
+            "rank": 3
+          },
+          {
+            "name": "松尾",
+            "team": "6GD",
+            "tournament": "chugoku.pdf",
+            "rank": 3
+          }
+        ]
+      },
+      {
+        "name": "年生以下女子ダブルス",
+        "gender": "女子",
+        "grade": "一般",
+        "players": [
+          {
+            "name": "小山",
+            "team": "久松台",
+            "tournament": "hiroshima.pdf",
+            "rank": 3
+          }
+        ]
+      },
+      {
+        "name": "４年生以下女子ダブルス",
+        "gender": "女子",
+        "grade": "一般",
+        "players": [
+          {
+            "name": "谷花",
+            "team": "東野ＳＢＣ",
+            "tournament": "hiroshima.pdf",
+            "rank": 3
+          },
+          {
+            "name": "湯原",
+            "team": "4GD",
+            "tournament": "chugoku.pdf",
+            "rank": 3
+          }
+        ]
+      },
+      {
+        "name": "5年生以下女子ダブルス（５ＧＤ）",
+        "gender": "女子",
+        "grade": "一般",
+        "players": [
+          {
+            "name": "鈴木",
+            "team": "猿払ＪＢＣ",
+            "tournament": "なの花薬局カップ 第44回北海道小学生バドミントン大会",
+            "rank": 3
+          }
+        ]
+      },
+      {
+        "name": "年生以下シングルス",
+        "gender": "不明",
+        "grade": "一般",
+        "players": [
+          {
+            "name": "板垣",
+            "team": "山口バド",
+            "tournament": "第３１回東北小学生バドミントン大会",
+            "rank": 3
+          },
+          {
+            "name": "安藤",
+            "team": "石巻クラブ",
+            "tournament": "第３１回東北小学生バドミントン大会",
+            "rank": 3
+          },
+          {
+            "name": "佐藤",
+            "team": "北方クラブ",
+            "tournament": "第３１回東北小学生バドミントン大会",
+            "rank": 3
+          },
+          {
+            "name": "三位決定戦",
+            "team": "香陵ＢＣ",
+            "tournament": "（１）本日の試合は令和７年度（公財）日本バドミントン協会競技規則、同大会運営規定、",
+            "rank": 3
+          },
+          {
+            "name": "男子",
+            "team": "香陵ＢＣ",
+            "tournament": "第30回福岡県小学生夏季バドミントン大会　福岡市予選会",
+            "rank": 3
+          }
+        ]
+      },
+      {
+        "name": "年生以下ダブルス",
+        "gender": "不明",
+        "grade": "一般",
+        "players": [
+          {
+            "name": "佐藤",
+            "team": "東和キッズ",
+            "tournament": "第３１回東北小学生バドミントン大会",
+            "rank": 3
+          },
+          {
+            "name": "工藤",
+            "team": "鮭川バド",
+            "tournament": "第３１回東北小学生バドミントン大会",
+            "rank": 3
+          },
+          {
+            "name": "佐藤",
+            "team": "奥羽ＪＢＣ",
+            "tournament": "第３１回東北小学生バドミントン大会",
+            "rank": 3
+          },
+          {
+            "name": "三瓶",
+            "team": "山口バド",
+            "tournament": "第３１回東北小学生バドミントン大会",
+            "rank": 3
+          },
+          {
+            "name": "年生以下ダブルス",
+            "team": "香陵ＢＣ",
+            "tournament": "（１）本日の試合は令和７年度（公財）日本バドミントン協会競技規則、同大会運営規定、",
+            "rank": 3
+          },
+          {
+            "name": "年生以下ダブルス",
+            "team": "すせんじジュニア",
+            "tournament": "第30回福岡県小学生夏季バドミントン大会　福岡市予選会",
+            "rank": 3
+          },
+          {
+            "name": "山下",
+            "team": "板付ジュニア",
+            "tournament": "第41回福岡県小学生選抜バドミントン大会　福岡市予選会",
+            "rank": 3
+          }
+        ]
+      },
+      {
+        "name": "不明",
+        "gender": "不明",
+        "grade": "一般",
+        "players": [
+          {
+            "name": "三位決定戦",
+            "team": "パンプキン",
+            "tournament": "kinki.pdf",
+            "rank": 3
+          },
+          {
+            "name": "三位決定戦",
+            "team": "Ｂ－ＴＲＩ",
+            "tournament": "kinki.pdf",
+            "rank": 3
+          }
+        ]
+      },
+      {
+        "name": "５年生以下男子シングルス",
+        "gender": "男子",
+        "grade": "一般",
+        "players": [
+          {
+            "name": "陽斗",
+            "team": "山口県",
+            "tournament": "chugoku.pdf",
+            "rank": 3
+          },
+          {
+            "name": "山本",
+            "team": "山口県",
+            "tournament": "chugoku.pdf",
+            "rank": 3
+          }
+        ]
+      },
+      {
+        "name": "4・5年生男子ダブルス",
+        "gender": "男子",
+        "grade": "不明",
+        "players": [
+          {
+            "name": "中島 陸",
+            "team": "ウイニング",
+            "tournament": "第1回近畿オープン小学生バドミントン大会",
+            "rank": 1
+          },
+          {
+            "name": "中山 大成",
+            "team": "PEACE",
+            "tournament": "第1回近畿オープン小学生バドミントン大会",
+            "rank": 2
+          },
+          {
+            "name": "安井 陸斗",
+            "team": "PANA-J",
+            "tournament": "第1回近畿オープン小学生バドミントン大会",
+            "rank": 3
+          },
+          {
+            "name": "駒井 孝行",
+            "team": "加古川ジュニア",
+            "tournament": "第1回近畿オープン小学生バドミントン大会",
+            "rank": 4
+          }
+        ]
+      },
+      {
+        "name": "4・5年生女子ダブルス",
+        "gender": "女子",
+        "grade": "不明",
+        "players": [
+          {
+            "name": "東山 夕姫",
+            "team": "NAKAOJBC",
+            "tournament": "第1回近畿オープン小学生バドミントン大会",
+            "rank": 1
+          },
+          {
+            "name": "野口 桜子",
+            "team": "D☆ARMY",
+            "tournament": "第1回近畿オープン小学生バドミントン大会",
+            "rank": 2
+          },
+          {
+            "name": "豊口 紗智華",
+            "team": "広島安佐",
+            "tournament": "第1回近畿オープン小学生バドミントン大会",
+            "rank": 3
+          },
+          {
+            "name": "山名 このみ",
+            "team": "瀬田北",
+            "tournament": "第1回近畿オープン小学生バドミントン大会",
+            "rank": 4
+          },
+          {
+            "name": "田中 夢理",
+            "team": "PEACE",
+            "tournament": "第1回近畿オープン小学生バドミントン大会",
+            "rank": 5
+          },
+          {
+            "name": "岩井 仁香",
+            "team": "D☆ARMY",
+            "tournament": "第1回近畿オープン小学生バドミントン大会",
+            "rank": 5
+          },
+          {
+            "name": "梅本 実香",
+            "team": "橿原ジュニア",
+            "tournament": "第1回近畿オープン小学生バドミントン大会",
+            "rank": 1
+          },
+          {
+            "name": "内藤 慧",
+            "team": "Nラインクラブ",
+            "tournament": "第1回近畿オープン小学生バドミントン大会",
+            "rank": 2
+          },
+          {
+            "name": "佐野 未菜美",
+            "team": "TOYO体協",
+            "tournament": "第1回近畿オープン小学生バドミントン大会",
+            "rank": 3
+          },
+          {
+            "name": "浦島 実玖",
+            "team": "橿原ジュニア",
+            "tournament": "第1回近畿オープン小学生バドミントン大会",
+            "rank": 4
+          },
+          {
+            "name": "吉岡 葉菜",
+            "team": "D☆ARMY",
+            "tournament": "第1回近畿オープン小学生バドミントン大会",
+            "rank": 5
+          },
+          {
+            "name": "立野 葉月",
+            "team": "PEACE",
+            "tournament": "第1回近畿オープン小学生バドミントン大会",
+            "rank": 5
+          }
+        ]
+      },
+      {
+        "name": "6年生女子シングルス",
+        "gender": "女子",
+        "grade": "不明",
+        "players": [
+          {
+            "name": "月渚",
+            "team": "Nラインクラブ",
+            "tournament": "第1回近畿オープン小学生バドミントン大会",
+            "rank": 2
+          },
+          {
+            "name": "優羽",
+            "team": "長岡京市スポ少",
+            "tournament": "第1回近畿オープン小学生バドミントン大会",
+            "rank": 4
+          },
+          {
+            "name": "彩綾",
+            "team": "立花シャトル",
+            "tournament": "第1回近畿オープン小学生バドミントン大会",
+            "rank": 3
+          }
+        ]
+      },
+      {
+        "name": "6年生男子ダブルス",
+        "gender": "男子",
+        "grade": "不明",
+        "players": [
+          {
+            "name": "岡村 翔汰",
+            "team": "永井BC",
+            "tournament": "第1回近畿オープン小学生バドミントン大会",
+            "rank": 1
+          },
+          {
+            "name": "田中 勇成",
+            "team": "三木ジュニア",
+            "tournament": "第1回近畿オープン小学生バドミントン大会",
+            "rank": 2
+          },
+          {
+            "name": "黒川 大毅",
+            "team": "川内JBC",
+            "tournament": "第1回近畿オープン小学生バドミントン大会",
+            "rank": 3
+          },
+          {
+            "name": "今川 拓海",
+            "team": "おろちクラブ",
+            "tournament": "第1回近畿オープン小学生バドミントン大会",
+            "rank": 1
+          },
+          {
+            "name": "本庄 克将",
+            "team": "坂本倶楽部",
+            "tournament": "第1回近畿オープン小学生バドミントン大会",
+            "rank": 2
+          },
+          {
+            "name": "三田 瑠希斗",
+            "team": "和歌山ジュニア",
+            "tournament": "第1回近畿オープン小学生バドミントン大会",
+            "rank": 3
+          },
+          {
+            "name": "立野 楓稀",
+            "team": "PEACE",
+            "tournament": "第1回近畿オープン小学生バドミントン大会",
+            "rank": 1
+          },
+          {
+            "name": "田原 翼",
+            "team": "おろちクラブ",
+            "tournament": "第1回近畿オープン小学生バドミントン大会",
+            "rank": 2
+          },
+          {
+            "name": "寺井 悠貴",
+            "team": "高槻AJBC",
+            "tournament": "第1回近畿オープン小学生バドミントン大会",
+            "rank": 3
+          },
+          {
+            "name": "辻 伸崇",
+            "team": "岩出市スポ少",
+            "tournament": "第1回近畿オープン小学生バドミントン大会",
+            "rank": 4
+          },
+          {
+            "name": "黒川 大亮",
+            "team": "東温ジュニア",
+            "tournament": "第1回近畿オープン小学生バドミントン大会",
+            "rank": 1
+          },
+          {
+            "name": "近藤 拓空",
+            "team": "PANA-J",
+            "tournament": "第1回近畿オープン小学生バドミントン大会",
+            "rank": 2
+          },
+          {
+            "name": "溝 蒼生",
+            "team": "南郷キューピット",
+            "tournament": "第1回近畿オープン小学生バドミントン大会",
+            "rank": 3
+          },
+          {
+            "name": "恵比須 蒼斗",
+            "team": "橿原ジュニア",
+            "tournament": "第1回近畿オープン小学生バドミントン大会",
+            "rank": 4
+          }
+        ]
+      },
+      {
+        "name": "5年生男子ダブルス",
+        "gender": "男子",
+        "grade": "不明",
+        "players": [
+          {
+            "name": "小原 輝",
+            "team": "たなしMAX",
+            "tournament": "第1回近畿オープン小学生バドミントン大会",
+            "rank": 1
+          },
+          {
+            "name": "徳岡 大地",
+            "team": "坂本倶楽部",
+            "tournament": "第1回近畿オープン小学生バドミントン大会",
+            "rank": 2
+          },
+          {
+            "name": "鈴木 伯虎",
+            "team": "ぐるぐるパンチ",
+            "tournament": "第1回近畿オープン小学生バドミントン大会",
+            "rank": 3
+          },
+          {
+            "name": "松村 拓海",
+            "team": "久御山",
+            "tournament": "第1回近畿オープン小学生バドミントン大会",
+            "rank": 4
+          },
+          {
+            "name": "沼田 慧和",
+            "team": "南郷キューピット",
+            "tournament": "第1回近畿オープン小学生バドミントン大会",
+            "rank": 5
+          },
+          {
+            "name": "小沼 孝次",
+            "team": "青梅ジュニア",
+            "tournament": "第1回近畿オープン小学生バドミントン大会",
+            "rank": 6
+          }
+        ]
+      },
+      {
+        "name": "4年生男子ダブルス",
+        "gender": "男子",
+        "grade": "不明",
+        "players": [
+          {
+            "name": "中島 陸",
+            "team": "ウイニング",
+            "tournament": "第1回近畿オープン小学生バドミントン大会",
+            "rank": 1
+          },
+          {
+            "name": "中山 大成",
+            "team": "PEACE",
+            "tournament": "第1回近畿オープン小学生バドミントン大会",
+            "rank": 2
+          },
+          {
+            "name": "安井 陸斗",
+            "team": "PANA-J",
+            "tournament": "第1回近畿オープン小学生バドミントン大会",
+            "rank": 3
+          },
+          {
+            "name": "駒井 孝行",
+            "team": "加古川ジュニア",
+            "tournament": "第1回近畿オープン小学生バドミントン大会",
+            "rank": 4
+          }
+        ]
+      },
+      {
+        "name": "6年生女子ダブルス",
+        "gender": "女子",
+        "grade": "不明",
+        "players": [
+          {
+            "name": "松本 佳苗",
+            "team": "橿原ジュニア",
+            "tournament": "第1回近畿オープン小学生バドミントン大会",
+            "rank": 1
+          },
+          {
+            "name": "物部 咲月",
+            "team": "松江JBC",
+            "tournament": "第1回近畿オープン小学生バドミントン大会",
+            "rank": 2
+          },
+          {
+            "name": "若野 真子",
+            "team": "仰木の里",
+            "tournament": "第1回近畿オープン小学生バドミントン大会",
+            "rank": 3
+          },
+          {
+            "name": "山口 小夏",
+            "team": "瓜破西SSC",
+            "tournament": "第1回近畿オープン小学生バドミントン大会",
+            "rank": 1
+          },
+          {
+            "name": "日野 優菜",
+            "team": "おろちクラブ",
+            "tournament": "第1回近畿オープン小学生バドミントン大会",
+            "rank": 2
+          },
+          {
+            "name": "大野 美海",
+            "team": "坂本JBC",
+            "tournament": "第1回近畿オープン小学生バドミントン大会",
+            "rank": 3
+          },
+          {
+            "name": "松永 千怜",
+            "team": "青梅ジュニア",
+            "tournament": "第1回近畿オープン小学生バドミントン大会",
+            "rank": 1
+          },
+          {
+            "name": "浦上 路望",
+            "team": "岩出市スポ少",
+            "tournament": "第1回近畿オープン小学生バドミントン大会",
+            "rank": 2
+          },
+          {
+            "name": "千尋",
+            "team": "東野ジュニア",
+            "tournament": "第1回近畿オープン小学生バドミントン大会",
+            "rank": 3
+          },
+          {
+            "name": "愛珠",
+            "team": "因島ジュニア",
+            "tournament": "第1回近畿オープン小学生バドミントン大会",
+            "rank": 3
+          },
+          {
+            "name": "秋田 ゆい",
+            "team": "永井BC",
+            "tournament": "第1回近畿オープン小学生バドミントン大会",
+            "rank": 1
+          },
+          {
+            "name": "堀田 心羽",
+            "team": "TOMO",
+            "tournament": "第1回近畿オープン小学生バドミントン大会",
+            "rank": 2
+          },
+          {
+            "name": "捻原 奈桜",
+            "team": "大徳ジュニア",
+            "tournament": "第1回近畿オープン小学生バドミントン大会",
+            "rank": 3
+          },
+          {
+            "name": "真木 ほのか",
+            "team": "JBAC",
+            "tournament": "第1回近畿オープン小学生バドミントン大会",
+            "rank": 4
+          },
+          {
+            "name": "日野 優菜",
+            "team": "松江JBC",
+            "tournament": "第1回近畿オープン小学生バドミントン大会",
+            "rank": 2
+          },
+          {
+            "name": "浦上 路望",
+            "team": "岩出",
+            "tournament": "第1回近畿オープン小学生バドミントン大会",
+            "rank": 4
+          },
+          {
+            "name": "大野 美海",
+            "team": "愛媛",
+            "tournament": "第1回近畿オープン小学生バドミントン大会",
+            "rank": 2
+          },
+          {
+            "name": "岩野 真子",
+            "team": "仰木の里",
+            "tournament": "第1回近畿オープン小学生バドミントン大会",
+            "rank": 3
+          }
+        ]
+      },
+      {
+        "name": "5年生女子ダブルス",
+        "gender": "女子",
+        "grade": "不明",
+        "players": [
+          {
+            "name": "東山 夕姫",
+            "team": "NAKAOJBC",
+            "tournament": "第1回近畿オープン小学生バドミントン大会",
+            "rank": 1
+          },
+          {
+            "name": "梅本 実香",
+            "team": "橿原ジュニア",
+            "tournament": "第1回近畿オープン小学生バドミントン大会",
+            "rank": 2
+          },
+          {
+            "name": "内藤 慧",
+            "team": "Nラインクラブ",
+            "tournament": "第1回近畿オープン小学生バドミントン大会",
+            "rank": 3
+          },
+          {
+            "name": "野口 桜子",
+            "team": "D☆ARMY",
+            "tournament": "第1回近畿オープン小学生バドミントン大会",
+            "rank": 4
+          },
+          {
+            "name": "山名このみ",
+            "team": "瀬田北",
+            "tournament": "第1回近畿オープン小学生バドミントン大会",
+            "rank": 5
+          }
+        ]
+      },
+      {
+        "name": "4年生女子ダブルス",
+        "gender": "女子",
+        "grade": "不明",
+        "players": [
+          {
+            "name": "豊口 紗智華",
+            "team": "広島安佐",
+            "tournament": "第1回近畿オープン小学生バドミントン大会",
+            "rank": 1
+          },
+          {
+            "name": "岩井 仁香",
+            "team": "D☆ARMY",
+            "tournament": "第1回近畿オープン小学生バドミントン大会",
+            "rank": 2
+          },
+          {
+            "name": "浦島 実玖",
+            "team": "橿原ジュニア",
+            "tournament": "第1回近畿オープン小学生バドミントン大会",
+            "rank": 3
+          },
+          {
+            "name": "立野 葉月",
+            "team": "PEACE",
+            "tournament": "第1回近畿オープン小学生バドミントン大会",
+            "rank": 4
+          },
+          {
+            "name": "佐野 未菜美",
+            "team": "TOYO体協",
+            "tournament": "第1回近畿オープン小学生バドミントン大会",
+            "rank": 1
+          },
+          {
+            "name": "田中 夢理",
+            "team": "PEACE",
+            "tournament": "第1回近畿オープン小学生バドミントン大会",
+            "rank": 2
+          },
+          {
+            "name": "吉岡 葉菜",
+            "team": "D☆ARMY",
+            "tournament": "第1回近畿オープン小学生バドミントン大会",
+            "rank": 3
+          }
+        ]
+      },
+      {
+        "name": "年の部シングルス",
+        "gender": "不明",
+        "grade": "一般",
+        "players": [
+          {
+            "name": "三位決定戦",
+            "team": "ＡＲＲＯＷ＇Ｓ",
+            "tournament": "第42回埼玉県小学生バドミントン大会 兼 第34回全国小学生バドミントン大会埼玉県予選会",
+            "rank": 3
+          }
+        ]
+      },
+      {
+        "name": "女子５年の部シングルス",
+        "gender": "女子",
+        "grade": "一般",
+        "players": [
+          {
+            "name": "三位決定戦",
+            "team": "出羽タン",
+            "tournament": "第42回埼玉県小学生バドミントン大会 兼 第34回全国小学生バドミントン大会埼玉県予選会",
+            "rank": 3
+          }
+        ]
+      },
+      {
+        "name": "Ａ男子シングルス",
+        "gender": "男子",
+        "grade": "一般",
+        "players": [
+          {
+            "name": "浅野",
+            "team": "高山Ｖ",
+            "tournament": "2026-syogaku-abc-k.pdf",
+            "rank": 3
+          }
+        ]
+      },
+      {
+        "name": "Ｃ女子シングルス",
+        "gender": "女子",
+        "grade": "一般",
+        "players": [
+          {
+            "name": "篠原",
+            "team": "高山Ｖ",
+            "tournament": "2025-abc-kekka.pdf",
+            "rank": 3
+          }
+        ]
+      },
+      {
+        "name": "６年以下女子ダブルス",
+        "gender": "女子",
+        "grade": "一般",
+        "players": [
+          {
+            "name": "新井",
+            "team": "波田スポ少",
+            "tournament": "第４回 長野県小学生ダブルスバドミントン大会",
+            "rank": 3
+          }
+        ]
+      },
+      {
+        "name": "５年以下男子ダブルス",
+        "gender": "男子",
+        "grade": "一般",
+        "players": [
+          {
+            "name": "太田",
+            "team": "高山Ｖ",
+            "tournament": "第４回 長野県小学生ダブルスバドミントン大会",
+            "rank": 3
+          }
+        ]
+      },
+      {
+        "name": "４年以下女子ダブルス",
+        "gender": "女子",
+        "grade": "一般",
+        "players": [
+          {
+            "name": "中澤",
+            "team": "信濃五岳",
+            "tournament": "第４回 長野県小学生ダブルスバドミントン大会",
+            "rank": 3
+          }
+        ]
+      },
+      {
+        "name": "３年以下女子ダブルス",
+        "gender": "女子",
+        "grade": "一般",
+        "players": [
+          {
+            "name": "松下",
+            "team": "駒ヶ根ＢＣ",
+            "tournament": "第４回 長野県小学生ダブルスバドミントン大会",
+            "rank": 3
+          }
+        ]
+      },
+      {
+        "name": "４年生以下男子シングルス",
+        "gender": "男子",
+        "grade": "一般",
+        "players": [
+          {
+            "name": "田中",
+            "team": "ＳＣＪ",
+            "tournament": "2025-shogaku-kenjunor-kpdf.pdf",
+            "rank": 3
+          }
+        ]
+      },
+      {
+        "name": "６年男子シングルス",
+        "gender": "男子",
+        "grade": "一般",
+        "players": [
+          {
+            "name": "平松",
+            "team": "ＳＣＪ",
+            "tournament": "2025-shogaku-shuki-k.pdf",
+            "rank": 3
+          }
+        ]
+      },
+      {
+        "name": "４年女子シングルス",
+        "gender": "女子",
+        "grade": "一般",
+        "players": [
+          {
+            "name": "徳村",
+            "team": "ＳＣＪ",
+            "tournament": "2025-shogaku-shuki-k.pdf",
+            "rank": 3
+          }
+        ]
+      },
+      {
+        "name": "３年生以下男子ダブルス",
+        "gender": "男子",
+        "grade": "一般",
+        "players": [
+          {
+            "name": "高橋",
+            "team": "駒ヶ根ＢＣ",
+            "tournament": "2026-syogaku-syunki-k.pdf",
+            "rank": 3
+          }
+        ]
+      },
+      {
+        "name": "男子５年生以下シングルス",
+        "gender": "男子",
+        "grade": "一般",
+        "players": [
+          {
+            "name": "三位決定戦",
+            "team": "香陵ＢＣ",
+            "tournament": "第34回福岡県小学生夏季大会福岡市予選会",
+            "rank": 3
+          },
+          {
+            "name": "山崎",
+            "team": "ＳＫＹ",
+            "tournament": "第41回福岡県小学生選抜バドミントン大会　福岡市予選会",
+            "rank": 3
+          }
+        ]
+      },
+      {
+        "name": "女子４年生以下シングルス",
+        "gender": "女子",
+        "grade": "一般",
+        "players": [
+          {
+            "name": "三位決定戦",
+            "team": "香陵ＢＣ",
+            "tournament": "第34回福岡県小学生夏季大会福岡市予選会",
+            "rank": 3
+          },
+          {
+            "name": "三位決定戦",
+            "team": "香陵ＢＣ",
+            "tournament": "第４２回福岡県小学生選抜バドミントン大会",
+            "rank": 3
+          }
+        ]
+      },
+      {
+        "name": "中学女子シングルス－２／２",
+        "gender": "女子",
+        "grade": "中学",
+        "players": [
+          {
+            "name": "紗那",
+            "team": "城南中",
+            "tournament": "第26回全日本中学生バドミントン選手権大会福岡市予選会",
+            "rank": 3
+          }
+        ]
+      },
+      {
+        "name": "中学女子ダブルス－２／２",
+        "gender": "女子",
+        "grade": "中学",
+        "players": [
+          {
+            "name": "愛奈",
+            "team": "照葉中",
+            "tournament": "第26回全日本中学生バドミントン選手権大会福岡市予選会",
+            "rank": 3
+          }
+        ]
+      },
+      {
+        "name": "女子シングルス",
+        "gender": "女子",
+        "grade": "一般",
+        "players": [
+          {
+            "name": "白木",
+            "team": "城南中",
+            "tournament": "第45回中学生選抜バドミントン大会　福岡市予選会",
+            "rank": 3
+          }
+        ]
+      },
+      {
+        "name": "女子６年生以下ダブルス",
+        "gender": "女子",
+        "grade": "一般",
+        "players": [
+          {
+            "name": "向日葵",
+            "team": "板付ジュニア",
+            "tournament": "第４３回福岡県小学生選抜バドミントン大会",
+            "rank": 3
+          },
+          {
+            "name": "男子",
+            "team": "ステラキッズ",
+            "tournament": "第29回福岡県小学生夏季バドミントン大会 福岡市予選会",
+            "rank": 3
+          }
+        ]
+      },
+      {
+        "name": "中学女子ダブルス－２",
+        "gender": "女子",
+        "grade": "中学",
+        "players": [
+          {
+            "name": "白木",
+            "team": "筑紫野南中",
+            "tournament": "第２４回全日本中学生バドミントン選手権大会",
+            "rank": 3
+          }
+        ]
+      },
+      {
+        "name": "男子６年生以下ダブルス",
+        "gender": "男子",
+        "grade": "一般",
+        "players": [
+          {
+            "name": "松島",
+            "team": "香陵ＢＣ",
+            "tournament": "第４２回福岡県小学生選抜バドミントン大会",
+            "rank": 3
+          },
+          {
+            "name": "梁尋",
+            "team": "羽道會",
+            "tournament": "第41回福岡県小学生選抜バドミントン大会　福岡市予選会",
+            "rank": 3
+          }
+        ]
+      },
+      {
+        "name": "男子シングルス",
+        "gender": "男子",
+        "grade": "一般",
+        "players": [
+          {
+            "name": "井上",
+            "team": "元岡中",
+            "tournament": "第４２回福岡県中学生選抜バドミントン大会",
+            "rank": 3
+          }
+        ]
+      },
+      {
+        "name": "女子シングルス－２",
+        "gender": "女子",
+        "grade": "一般",
+        "players": [
+          {
+            "name": "永江",
+            "team": "元岡中",
+            "tournament": "第４２回福岡県中学生選抜バドミントン大会",
+            "rank": 3
+          },
+          {
+            "name": "穴井",
+            "team": "元岡中",
+            "tournament": "第41回中学生選抜バドミントン大会　福岡市予選会",
+            "rank": 3
+          }
+        ]
+      },
+      {
+        "name": "男子ダブルス",
+        "gender": "男子",
+        "grade": "一般",
+        "players": [
+          {
+            "name": "井上",
+            "team": "板付中",
+            "tournament": "第４２回福岡県中学生選抜バドミントン大会",
+            "rank": 3
+          }
+        ]
+      },
+      {
+        "name": "中学女子シングルスＡ級－",
+        "gender": "女子",
+        "grade": "中学",
+        "players": [
+          {
+            "name": "吉田",
+            "team": "照葉中",
+            "tournament": "第36回市民総合スポーツ中学生大会",
+            "rank": 3
+          }
+        ]
+      },
+      {
+        "name": "中学男子ダブルスＢ級",
+        "gender": "男子",
+        "grade": "中学",
+        "players": [
+          {
+            "name": "井上",
+            "team": "横手中",
+            "tournament": "第64回福岡市民春季バドミントン大会",
+            "rank": 3
+          },
+          {
+            "name": "大石",
+            "team": "玄洋中",
+            "tournament": "第35回市民総合スポーツ大会 ベスト４　　　　　　　　　　2021.07.04　福岡市総合体育館",
+            "rank": 3
+          }
+        ]
+      },
+      {
+        "name": "中学女子ダブルスＡ級－２",
+        "gender": "女子",
+        "grade": "中学",
+        "players": [
+          {
+            "name": "井上",
+            "team": "三宅中",
+            "tournament": "第64回福岡市民春季バドミントン大会",
+            "rank": 3
+          }
+        ]
+      },
+      {
+        "name": "中学女子ダブルス",
+        "gender": "女子",
+        "grade": "中学",
+        "players": [
+          {
+            "name": "平本",
+            "team": "ラブオールジュニア",
+            "tournament": "第19回福岡市中学生ﾊﾞﾄﾞﾐﾝﾄﾝ選手権大会",
+            "rank": 3
+          },
+          {
+            "name": "優衣",
+            "team": "元岡中",
+            "tournament": "第18回福岡市中学生バドミントン選手権大会",
+            "rank": 3
+          }
+        ]
+      },
+      {
+        "name": "女子６年生以下シングルス",
+        "gender": "女子",
+        "grade": "一般",
+        "players": [
+          {
+            "name": "森彩",
+            "team": "西戸崎小",
+            "tournament": "第41回福岡県小学生選抜バドミントン大会　福岡市予選会",
+            "rank": 3
+          }
+        ]
+      },
+      {
+        "name": "女子ダブルス－２",
+        "gender": "女子",
+        "grade": "一般",
+        "players": [
+          {
+            "name": "福田",
+            "team": "照葉中",
+            "tournament": "第41回中学生選抜バドミントン大会　福岡市予選会",
+            "rank": 3
+          }
+        ]
+      },
+      {
+        "name": "中学女子シングルス－２",
+        "gender": "女子",
+        "grade": "中学",
+        "players": [
+          {
+            "name": "穴井",
+            "team": "板付中",
+            "tournament": "第22回全日本中学生バドミントン選手権大会福岡市予選会",
+            "rank": 3
+          }
+        ]
+      },
+      {
+        "name": "中学女子ダブルスＢ級",
+        "gender": "女子",
+        "grade": "中学",
+        "players": [
+          {
+            "name": "末房",
+            "team": "内浜中",
+            "tournament": "第35回市民総合スポーツ大会 ベスト４　　　　　　　　　　2021.07.04　福岡市総合体育館",
+            "rank": 3
+          }
+        ]
+      },
+      {
+        "name": "中学男子シングルスＢ級",
+        "gender": "男子",
+        "grade": "中学",
+        "players": [
+          {
+            "name": "藤野",
+            "team": "城南中",
+            "tournament": "第63回福岡市民春季バドミントン大会",
+            "rank": 3
+          }
+        ]
+      },
+      {
+        "name": "中学男子ダブルスＡ級",
+        "gender": "男子",
+        "grade": "中学",
+        "players": [
+          {
+            "name": "小川",
+            "team": "横手中",
+            "tournament": "第63回福岡市民春季バドミントン大会",
+            "rank": 3
+          }
+        ]
+      },
+      {
+        "name": "中学女子ダブルスＢ級－",
+        "gender": "女子",
+        "grade": "中学",
+        "players": [
+          {
+            "name": "山下",
+            "team": "照葉中",
+            "tournament": "第63回福岡市民春季バドミントン大会",
+            "rank": 3
+          }
+        ]
+      },
+      {
+        "name": "中学男子ダブルス",
+        "gender": "男子",
+        "grade": "中学",
+        "players": [
+          {
+            "name": "明石",
+            "team": "元岡中",
+            "tournament": "第18回福岡市中学生バドミントン選手権大会",
+            "rank": 3
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "year": 2025,
+    "categories": [
+      {
+        "name": "５年生以下女子ダブルス",
+        "gender": "女子",
+        "grade": "一般",
+        "players": [
+          {
+            "name": "三位決定戦",
+            "team": "広幡バドキッズ",
+            "tournament": "第37回東海小学生バドミントン選手権大会（個人戦）",
+            "rank": 3
+          }
+        ]
+      },
+      {
+        "name": "６年生以下男子ダブルス",
+        "gender": "男子",
+        "grade": "一般",
+        "players": [
+          {
+            "name": "三位決定戦",
+            "team": "ユ二バーズ岡崎",
+            "tournament": "第37回東海小学生バドミントン選手権大会（個人戦）",
+            "rank": 3
+          }
+        ]
+      },
+      {
+        "name": "６年生女子シングルス",
+        "gender": "女子",
+        "grade": "一般",
+        "players": [
+          {
+            "name": "三位決定戦",
+            "team": "垂井ＪＳＣ",
+            "tournament": "第37回東海小学生バドミントン選手権大会（個人戦）",
+            "rank": 3
+          }
+        ]
+      },
+      {
+        "name": "６年生以下女子ダブルス",
+        "gender": "女子",
+        "grade": "一般",
+        "players": [
+          {
+            "name": "三位決定戦",
+            "team": "羽島クラブ",
+            "tournament": "第37回東海小学生バドミントン選手権大会（個人戦）",
+            "rank": 3
+          }
+        ]
+      }
+    ]
+  }
+]

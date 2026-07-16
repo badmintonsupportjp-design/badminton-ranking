@@ -1,0 +1,7 @@
+{
+  "_note": "champions/third を目視確認し、確定した順位を players[].rank に反映してから index.js --import で取込むこと。ダブルスは優勝ペア2名が champions に並ぶ。",
+  "year": 2025,
+  "tournament": "第７９回国民スポーツ大会バドミントン競技長野県少年の部選考会 要項",
+  "categories": [],
+  "_warnings": []
+}

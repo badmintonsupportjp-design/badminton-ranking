@@ -1,0 +1,57 @@
+{
+  "_note": "champions/third を目視確認し、確定した順位を players[].rank に反映してから index.js --import で取込むこと。ダブルスは優勝ペア2名が champions に並ぶ。",
+  "year": 2026,
+  "tournament": "第35回市民総合スポーツ大会 ベスト４　　　　　　　　　　2021.07.04　福岡市総合体育館",
+  "categories": [
+    {
+      "name": "不明",
+      "gender": "不明",
+      "grade": "一般",
+      "players": []
+    },
+    {
+      "name": "中学男子ダブルスＢ級",
+      "gender": "男子",
+      "grade": "中学",
+      "players": [
+        {
+          "name": "大石",
+          "team": "玄洋中",
+          "tournament": "第35回市民総合スポーツ大会 ベスト４　　　　　　　　　　2021.07.04　福岡市総合体育館",
+          "rank": 3,
+          "_evidence": "三位決定戦勝者"
+        },
+        {
+          "name": "大石",
+          "team": "玄洋中",
+          "tournament": "第35回市民総合スポーツ大会 ベスト４　　　　　　　　　　2021.07.04　福岡市総合体育館",
+          "rank": 3,
+          "_evidence": "三位決定戦勝者"
+        }
+      ]
+    },
+    {
+      "name": "中学女子ダブルスＡ級",
+      "gender": "女子",
+      "grade": "中学",
+      "players": []
+    },
+    {
+      "name": "中学女子ダブルスＢ級",
+      "gender": "女子",
+      "grade": "中学",
+      "players": [
+        {
+          "name": "末房",
+          "team": "内浜中",
+          "tournament": "第35回市民総合スポーツ大会 ベスト４　　　　　　　　　　2021.07.04　福岡市総合体育館",
+          "rank": 3,
+          "_evidence": "三位決定戦勝者"
+        }
+      ]
+    }
+  ],
+  "_warnings": [
+    "三位決定戦マーカー(y=51.9)の勝者名を特定できず"
+  ]
+}

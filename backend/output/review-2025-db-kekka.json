@@ -1,0 +1,91 @@
+{
+  "_note": "champions/third を目視確認し、確定した順位を players[].rank に反映してから index.js --import で取込むこと。ダブルスは優勝ペア2名が champions に並ぶ。",
+  "year": 2026,
+  "tournament": "第４回 長野県小学生ダブルスバドミントン大会",
+  "categories": [
+    {
+      "name": "不明",
+      "gender": "不明",
+      "grade": "一般",
+      "players": []
+    },
+    {
+      "name": "６年以下男子ダブルス",
+      "gender": "男子",
+      "grade": "一般",
+      "players": []
+    },
+    {
+      "name": "６年以下女子ダブルス",
+      "gender": "女子",
+      "grade": "一般",
+      "players": [
+        {
+          "name": "新井",
+          "team": "波田スポ少",
+          "tournament": "第４回 長野県小学生ダブルスバドミントン大会",
+          "rank": 3,
+          "_evidence": "三位決定戦勝者"
+        }
+      ]
+    },
+    {
+      "name": "５年以下男子ダブルス",
+      "gender": "男子",
+      "grade": "一般",
+      "players": [
+        {
+          "name": "太田",
+          "team": "高山Ｖ",
+          "tournament": "第４回 長野県小学生ダブルスバドミントン大会",
+          "rank": 3,
+          "_evidence": "三位決定戦勝者"
+        }
+      ]
+    },
+    {
+      "name": "５年以下女子ダブルス",
+      "gender": "女子",
+      "grade": "一般",
+      "players": []
+    },
+    {
+      "name": "４年以下女子ダブルス",
+      "gender": "女子",
+      "grade": "一般",
+      "players": []
+    },
+    {
+      "name": "４年以下女子ダブルス",
+      "gender": "女子",
+      "grade": "一般",
+      "players": [
+        {
+          "name": "中澤",
+          "team": "信濃五岳",
+          "tournament": "第４回 長野県小学生ダブルスバドミントン大会",
+          "rank": 3,
+          "_evidence": "三位決定戦勝者"
+        }
+      ]
+    },
+    {
+      "name": "３年以下女子ダブルス",
+      "gender": "女子",
+      "grade": "一般",
+      "players": [
+        {
+          "name": "松下",
+          "team": "駒ヶ根ＢＣ",
+          "tournament": "第４回 長野県小学生ダブルスバドミントン大会",
+          "rank": 3,
+          "_evidence": "三位決定戦勝者"
+        }
+      ]
+    }
+  ],
+  "_warnings": [
+    "三位決定戦マーカー(y=51.9)の勝者名を特定できず",
+    "三位決定戦マーカー(y=51.9)の勝者名を特定できず"
+  ]
+}

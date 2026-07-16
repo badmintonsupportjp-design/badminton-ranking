@@ -1,0 +1,14 @@
+{
+  "_note": "champions/third を目視確認し、確定した順位を players[].rank に反映してから index.js --import で取込むこと。ダブルスは優勝ペア2名が champions に並ぶ。",
+  "year": 2026,
+  "tournament": "８．競技規則   ２０２５年度（公財）日本バドミントン協会競技則及び大会運営規定、同公認審判員規定に",
+  "categories": [
+    {
+      "name": "ダブルスにおいて",
+      "gender": "不明",
+      "grade": "一般",
+      "players": []
+    }
+  ],
+  "_warnings": []
+}

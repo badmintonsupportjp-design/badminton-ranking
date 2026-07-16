@@ -1,0 +1,149 @@
+{
+  "_note": "champions/third を目視確認し、確定した順位を players[].rank に反映してから index.js --import で取込むこと。ダブルスは優勝ペア2名が champions に並ぶ。",
+  "year": 2026,
+  "tournament": "第３１回東北小学生バドミントン大会",
+  "categories": [
+    {
+      "name": "年生以下シングルス",
+      "gender": "不明",
+      "grade": "一般",
+      "players": []
+    },
+    {
+      "name": "年生以下シングルス",
+      "gender": "不明",
+      "grade": "一般",
+      "players": []
+    },
+    {
+      "name": "年生以下シングルス",
+      "gender": "不明",
+      "grade": "一般",
+      "players": [
+        {
+          "name": "板垣",
+          "team": "山口バド",
+          "tournament": "第３１回東北小学生バドミントン大会",
+          "rank": 3,
+          "_evidence": "三位決定戦勝者"
+        }
+      ]
+    },
+    {
+      "name": "年生以下シングルス",
+      "gender": "不明",
+      "grade": "一般",
+      "players": [
+        {
+          "name": "安藤",
+          "team": "石巻クラブ",
+          "tournament": "第３１回東北小学生バドミントン大会",
+          "rank": 3,
+          "_evidence": "三位決定戦勝者"
+        }
+      ]
+    },
+    {
+      "name": "年生以下シングルス",
+      "gender": "不明",
+      "grade": "一般",
+      "players": [
+        {
+          "name": "佐藤",
+          "team": "北方クラブ",
+          "tournament": "第３１回東北小学生バドミントン大会",
+          "rank": 3,
+          "_evidence": "三位決定戦勝者"
+        }
+      ]
+    },
+    {
+      "name": "年生以下シングルス",
+      "gender": "不明",
+      "grade": "一般",
+      "players": []
+    },
+    {
+      "name": "年生以下ダブルス",
+      "gender": "不明",
+      "grade": "一般",
+      "players": []
+    },
+    {
+      "name": "年生以下ダブルス",
+      "gender": "不明",
+      "grade": "一般",
+      "players": [
+        {
+          "name": "佐藤",
+          "team": "東和キッズ",
+          "tournament": "第３１回東北小学生バドミントン大会",
+          "rank": 3,
+          "_evidence": "三位決定戦勝者"
+        }
+      ]
+    },
+    {
+      "name": "年生以下ダブルス",
+      "gender": "不明",
+      "grade": "一般",
+      "players": [
+        {
+          "name": "工藤",
+          "team": "鮭川バド",
+          "tournament": "第３１回東北小学生バドミントン大会",
+          "rank": 3,
+          "_evidence": "三位決定戦勝者"
+        }
+      ]
+    },
+    {
+      "name": "年生以下ダブルス",
+      "gender": "不明",
+      "grade": "一般",
+      "players": [
+        {
+          "name": "佐藤",
+          "team": "奥羽ＪＢＣ",
+          "tournament": "第３１回東北小学生バドミントン大会",
+          "rank": 3,
+          "_evidence": "三位決定戦勝者"
+        }
+      ]
+    },
+    {
+      "name": "年生以下ダブルス",
+      "gender": "不明",
+      "grade": "一般",
+      "players": [
+        {
+          "name": "佐藤",
+          "team": "奥羽ＪＢＣ",
+          "tournament": "第３１回東北小学生バドミントン大会",
+          "rank": 3,
+          "_evidence": "三位決定戦勝者"
+        }
+      ]
+    },
+    {
+      "name": "年生以下ダブルス",
+      "gender": "不明",
+      "grade": "一般",
+      "players": [
+        {
+          "name": "三瓶",
+          "team": "山口バド",
+          "tournament": "第３１回東北小学生バドミントン大会",
+          "rank": 3,
+          "_evidence": "三位決定戦勝者"
+        }
+      ]
+    }
+  ],
+  "_warnings": [
+    "三位決定戦マーカー(y=51.9)の勝者名を特定できず",
+    "三位決定戦マーカー(y=51.9)の勝者名を特定できず",
+    "三位決定戦マーカー(y=51.9)の勝者名を特定できず",
+    "三位決定戦マーカー(y=51.9)の勝者名を特定できず"
+  ]
+}

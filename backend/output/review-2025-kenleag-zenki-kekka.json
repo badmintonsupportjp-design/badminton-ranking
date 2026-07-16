@@ -1,0 +1,7 @@
+{
+  "_note": "champions/third を目視確認し、確定した順位を players[].rank に反映してから index.js --import で取込むこと。ダブルスは優勝ペア2名が champions に並ぶ。",
+  "year": 2025,
+  "tournament": "2025年度　長野県バドミントン 県リーグ　前期大会の結果記録",
+  "categories": [],
+  "_warnings": []
+}
