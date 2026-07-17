@@ -30,4 +30,8 @@ jobs:
           git config user.email "bot@users.noreply.github.com"
           git add data.json backend/output || true
           git diff --cached --quiet || git commit -m "auto: update tournament data ($(date +%F))"
-          git push
+          # 実行中にリモートが更新されていても取り込んでからpush（最大3回リトライ）
+          for i in 1 2 3; do
+            git pull --rebase --autostash origin main && git push && break
+            echo "push retry $i"; sleep 5
+          done
