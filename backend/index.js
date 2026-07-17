@@ -162,15 +162,16 @@ const CATEGORY_RE =
   /((?:小(?:学)?|中(?:学)?|高(?:校)?)\s*\d?\s*年?|一般|シニア)?\s*(男子|女子|混合)\s*(シングルス|ダブルス|単|複)?/;
 
 // 順位表現: 優勝 / 準優勝 / 第3位 / 3位 / ベスト8
-const RANK_RE = /(優勝|準優勝|第?\s*(\d{1,2})\s*位|ベスト\s*(\d{1,2}))/;
+const RANK_RE = /(準\s*優\s*勝|優\s*勝|第?\s*(\d{1,2})\s*位|ベスト\s*(\d{1,2}))/;
 
 // 「氏名（チーム名）」の抽出
 const NAME_TEAM_RE =
   /([一-龠々〆ヵヶぁ-んァ-ヴa-zA-Z]+(?:[ 　][一-龠々〆ヵヶぁ-んァ-ヴa-zA-Z]+)*)\s*[（(]([^（()）]+)[）)]/g;
 
 function rankValue(rankText) {
-  if (rankText.includes("優勝") && !rankText.includes("準")) return 1;
-  if (rankText.includes("準優勝")) return 2;
+  const t = rankText.replace(/\s/g, "");
+  if (t.includes("優勝") && !t.includes("準")) return 1;
+  if (t.includes("準優勝")) return 2;
   const pos = rankText.match(/(\d{1,2})\s*位/);
   if (pos) return Number(pos[1]);
   const best = rankText.match(/ベスト\s*(\d{1,2})/);
@@ -203,8 +204,36 @@ function isCategoryLine(line) {
 }
 
 /**
+ * 最終順位・総合順位の1行表記を解析
+ * 例: 「最終順位　1位中野フレア　2位　山室中部スポ少　３位　ASTROBALS・パルセイロユース」
+ */
+function parseFinalRankLine(rawLine) {
+  if (!/(最終順位|総合順位)/.test(rawLine)) return null;
+  const s = zenToHan(rawLine);
+  const out = [];
+  const re = /(\d)\s*位\s*[:：]?\s*(.+?)(?=\s*\d\s*位|$)/g;
+  let m;
+  while ((m = re.exec(s)) !== null) {
+    for (const nm of m[2].split(/[・、,／/]/)) {
+      const name = nm.trim();
+      if (name.length >= 2 && name.length <= 25 && !/[()（）\d]{3,}/.test(name)) {
+        out.push({ name, team: "", rank: Number(m[1]) });
+      }
+    }
+  }
+  return out.length ? out : null;
+}
+
+const SCORE_RE = /\d+\s*[-ー−]\s*\d+/;
+
+/**
  * PDFテキスト → { year, tournament, categories[] }
- * PDFのレイアウトは大会ごとに異なるため、ここはヒューリスティック。
+ * 3段構えで解析する:
+ *   A. 順位一覧形式（優勝/第N位 + 氏名（所属）または チーム名のみ）
+ *   B. 「最終順位」1行表記
+ *   C. トーナメント表: エントリ「氏名（所属）」が所属なしで再登場する回数を数え、
+ *      最多＝最も勝ち上がった者を優勝と判定（曖昧なら不採用）。
+ *      「三位決定戦」直後に再登場するエントリ名は3位。
  * 精度が足りない場合は CATEGORY_RE / RANK_RE を対象PDFに合わせて調整する。
  */
 function extractResults(rawText, overrides = {}) {
@@ -214,33 +243,116 @@ function extractResults(rawText, overrides = {}) {
 
   const categories = new Map();
   let current = null;
+  const getCat = (name) => {
+    if (!categories.has(name)) categories.set(name, { ...parseCategoryName(name), players: [] });
+    return categories.get(name);
+  };
 
-  for (const rawLine of text.split(/\r?\n/)) {
+  // ---- ブラケット解析用の記録 ----
+  // entries: name -> { team, cat }  /  bare: name -> 再登場回数  /  third: Set(name)
+  const entries = new Map();
+  const bare = new Map();
+  const thirdWinners = new Set();
+  let pendingThird = 0; // 「三位決定戦」検出後の探索残り行数
+
+  const lines = text.split(/\r?\n/);
+  for (const rawLine of lines) {
     const line = rawLine.trim();
     if (!line) continue;
 
+    // カテゴリ見出し
     if (isCategoryLine(line) && CATEGORY_RE.test(line)) {
-      const meta = parseCategoryName(line);
-      if (!categories.has(meta.name)) {
-        categories.set(meta.name, { ...meta, players: [] });
-      }
-      current = categories.get(meta.name);
+      current = getCat(zenToHan(line).replace(/\s+/g, ""));
       continue;
     }
 
-    if (!current) continue;
+    // B. 最終順位1行表記
+    const finals = parseFinalRankLine(line);
+    if (finals) {
+      const cat = current || getCat("総合成績");
+      for (const f of finals) cat.players.push({ ...f, tournament });
+      continue;
+    }
 
-    const rankMatch = line.match(RANK_RE);
-    if (!rankMatch) continue;
-    const rank = rankValue(rankMatch[0]);
+    // 三位決定戦マーカー
+    if (/三位決定戦/.test(line)) { pendingThird = 6; }
 
-    let m;
+    // 順位語を行から除去した残り（氏名抽出はこちらで行う）
+    const RANK_G = new RegExp(RANK_RE.source, "g");
+    const stripped = line.replace(RANK_G, " ").replace(/\s+/g, " ").trim();
+
+    // エントリ登録: 氏名（所属）
+    let em; let hadEntry = false;
     NAME_TEAM_RE.lastIndex = 0;
-    while ((m = NAME_TEAM_RE.exec(line)) !== null) {
-      const name = m[1].replace(/\s+/g, " ").trim();
-      const team = m[2].trim();
-      if (name.length < 2 || /位|優勝|ベスト/.test(name)) continue;
-      current.players.push({ name, team, tournament, rank });
+    while ((em = NAME_TEAM_RE.exec(stripped)) !== null) {
+      const nm = em[1].replace(/\s+/g, " ").trim();
+      if (nm.length < 2 || /(位|優勝|ベスト|リーグ|決定戦)/.test(nm.replace(/\s/g, ""))) continue;
+      hadEntry = true;
+      if (!entries.has(nm)) entries.set(nm, { team: em[2].trim(), cat: current });
+    }
+
+    // A. 順位行
+    const rankMatch = line.match(RANK_RE);
+    if (rankMatch && current) {
+      const rank = rankValue(rankMatch[0]);
+      let matched = false;
+      let m2;
+      NAME_TEAM_RE.lastIndex = 0;
+      while ((m2 = NAME_TEAM_RE.exec(stripped)) !== null) {
+        const name = m2[1].replace(/\s+/g, " ").trim();
+        const team = m2[2].trim();
+        if (name.length < 2 || /(位|優勝|ベスト)/.test(name.replace(/\s/g, ""))) continue;
+        current.players.push({ name, team, tournament, rank });
+        matched = true;
+      }
+      // 括弧なし（チーム名だけ）の順位行: 「優勝 小布施ジュニア」
+      if (!matched && !SCORE_RE.test(line) && !/[（(]/.test(stripped)) {
+        const rest = stripped.replace(/^[  :：・･、]+/, "").trim();
+        if (rest.length >= 2 && rest.length <= 25 && !/^\d+$/.test(rest)) {
+          current.players.push({ name: rest, team: "", tournament, rank });
+        }
+      }
+      continue;
+    }
+
+    // C. 所属なし再登場のカウント（ブラケット勝ち上がり）
+    if (!hadEntry && !/[（(]/.test(line)) {
+      for (const token of line.split(/[ 　]+/)) {
+        const nm = token.trim();
+        if (!entries.has(nm)) continue;
+        if (pendingThird > 0) {
+          thirdWinners.add(nm); // 3位決定戦の勝者候補は優勝カウントに入れない
+        } else {
+          bare.set(nm, (bare.get(nm) || 0) + 1);
+        }
+      }
+      if (pendingThird > 0) pendingThird--;
+    }
+  }
+
+  // ---- C. ブラケット判定の確定（明示順位が無いカテゴリのみ） ----
+  const byCat = new Map(); // cat -> [{name, count}]
+  for (const [nm, cnt] of bare) {
+    const e = entries.get(nm);
+    const cat = e.cat || getCat("総合成績");
+    if (!byCat.has(cat)) byCat.set(cat, []);
+    byCat.get(cat).push({ name: nm, team: e.team, count: cnt });
+  }
+  for (const [cat, list] of byCat) {
+    if (cat.players.some((p) => p.rank === 1)) continue; // 明示順位があるなら触らない
+    list.sort((a, b) => b.count - a.count);
+    const max = list[0].count;
+    const top = list.filter((x) => x.count === max);
+    const second = list.find((x) => x.count < max);
+    // 単複対応: 最多再登場が1〜2名で、次点と差があるときだけ優勝と判定
+    if (top.length <= 2 && (!second || max - second.count >= 1)) {
+      for (const t of top) cat.players.push({ name: t.name, team: t.team, tournament, rank: 1 });
+    }
+    for (const nm of thirdWinners) {
+      const e = entries.get(nm);
+      if (e && e.cat === cat && !top.some((t) => t.name === nm)) {
+        cat.players.push({ name: nm, team: e.team, tournament, rank: 3 });
+      }
     }
   }
 
@@ -269,9 +381,13 @@ function mergeIntoData(data, parsed) {
     data.push(yearEntry);
   }
   for (const cat of parsed.categories) {
-    let catEntry = yearEntry.categories.find((c) => c.name === cat.name);
+    let catEntry = yearEntry.categories.find(
+      (c) => c.name === cat.name && (c.pref || "") === (cat.pref || "")
+    );
     if (!catEntry) {
       catEntry = { name: cat.name, gender: cat.gender, grade: cat.grade, players: [] };
+      if (cat.pref) catEntry.pref = cat.pref;
+      if (cat.division) catEntry.division = cat.division;
       yearEntry.categories.push(catEntry);
     }
     for (const p of cat.players) {
@@ -292,34 +408,98 @@ function saveData(data) {
 
 /* ============================== 実行フロー ============================== */
 
-async function parsePdfSmart(buffer) {
-  // 1) 通常のテキスト抽出
-  const pdf = await pdfParse()(buffer);
-  if ((pdf.text || "").replace(/\s/g, "").length >= 50) return pdf.text;
+const crypto = require("crypto");
+const { execFileSync, spawnSync } = require("child_process");
 
-  // 2) テキストがほぼ無い＝スキャン画像PDF → OCRフォールバック
-  //    npm install tesseract.js pdf-to-img を実行しておくと自動で有効になる
-  //    （tesseract.js は初回に日本語データ jpn.traineddata を自動DLする）
-  console.log("    ℹ テキスト無しPDF。OCRを試行します…");
+const hasCmd = (cmd, flag = "--version") => spawnSync(cmd, [flag], { stdio: "ignore" }).status === 0;
+
+/* ---- OCRテキストキャッシュ（同じPDFを毎週OCRし直さない） ---- */
+function cachePath(buffer) {
+  const h = crypto.createHash("sha1").update(buffer).digest("hex");
+  return path.join(CONFIG.outDir, "cache", h + ".txt");
+}
+function cacheGet(buffer) {
+  try { return fs.readFileSync(cachePath(buffer), "utf-8"); } catch { return null; }
+}
+function cacheSet(buffer, text) {
+  const p = cachePath(buffer);
+  fs.mkdirSync(path.dirname(p), { recursive: true });
+  fs.writeFileSync(p, text, "utf-8");
+}
+
+/* ---- 無料OCR その1: ネイティブ tesseract + poppler（GitHub Actionsで使用） ---- */
+function ocrViaCli(buffer) {
+  const os = require("os");
+  const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "ocr-"));
   try {
-    const { pdf: pdfToImg } = await import("pdf-to-img");
-    const { createWorker } = await import("tesseract.js");
-    const worker = await createWorker("jpn");
+    const pdfPath = path.join(tmp, "in.pdf");
+    fs.writeFileSync(pdfPath, buffer);
+    execFileSync("pdftoppm", ["-r", "300", "-gray", "-png", pdfPath, path.join(tmp, "pg")]);
+    const langs = execFileSync("tesseract", ["--list-langs"]).toString();
+    const lang = /jpn/.test(langs) ? "jpn" : "eng";
     let text = "";
-    const doc = await pdfToImg(buffer, { scale: 3 }); // 高解像度化でOCR精度向上
-    for await (const page of doc) {
-      const { data } = await worker.recognize(page);
-      text += data.text + "\n";
+    const pages = fs.readdirSync(tmp).filter((f) => f.endsWith(".png")).sort();
+    for (const f of pages.slice(0, 12)) { // ページ上限（安全弁）
+      const out = execFileSync(
+        "tesseract",
+        [path.join(tmp, f), "stdout", "-l", lang, "--psm", "6"],
+        { maxBuffer: 16 * 1024 * 1024, stdio: ["ignore", "pipe", "ignore"] }
+      );
+      text += out.toString() + "\n";
     }
-    await worker.terminate();
     return text;
+  } finally {
+    fs.rmSync(tmp, { recursive: true, force: true });
+  }
+}
+
+/* ---- 無料OCR その2: tesseract.js（ローカル実行者向けフォールバック） ---- */
+async function ocrViaJs(buffer) {
+  const { pdf: pdfToImg } = await import("pdf-to-img");
+  const { createWorker } = await import("tesseract.js");
+  const worker = await createWorker("jpn");
+  let text = "";
+  const doc = await pdfToImg(buffer, { scale: 3 });
+  let n = 0;
+  for await (const page of doc) {
+    const { data } = await worker.recognize(page);
+    text += data.text + "\n";
+    if (++n >= 12) break;
+  }
+  await worker.terminate();
+  return text;
+}
+
+async function parsePdfSmart(buffer) {
+  // 0) キャッシュ
+  const cached = cacheGet(buffer);
+  if (cached !== null) return cached;
+
+  // 1) 通常のテキスト抽出（pdf-parse未導入でも落ちずにOCRへ進む）
+  let text = "";
+  try {
+    const pdf = await pdfParse()(buffer);
+    text = pdf.text || "";
+  } catch { /* OCRへ */ }
+  if (text.replace(/\s/g, "").length >= 50) { cacheSet(buffer, text); return text; }
+
+  // 2) テキストがほぼ無い＝スキャン画像PDF → 無料OCR
+  console.log("    ℹ テキスト無しPDF。OCRを試行…");
+  try {
+    if (hasCmd("tesseract") && hasCmd("pdftoppm", "-v")) {
+      text = ocrViaCli(buffer);            // ネイティブ（高速・無料）
+    } else {
+      text = await ocrViaJs(buffer);       // JSフォールバック（無料）
+    }
   } catch (e) {
     console.error(
-      "    ⚠ OCR不可: `npm install tesseract.js pdf-to-img` を実行してください。" +
-        ` (${e.message})`
+      "    ⚠ OCR不可: Actionsなら apt install tesseract-ocr tesseract-ocr-jpn poppler-utils、" +
+      "ローカルなら `npm i tesseract.js pdf-to-img` を実行。" + ` (${e.message})`
     );
-    return "";
+    text = "";
   }
+  cacheSet(buffer, text); // 空でもキャッシュ（読めないPDFの再試行を防ぐ）
+  return text;
 }
 
 async function runScrapePipeline() {

@@ -27,6 +27,7 @@ const fs = require("fs");
 const path = require("path");
 const core = require("./index.js");
 const bracket = require("./bracket.js");
+const { aiReadPdf } = require("./ai-reader.js");
 
 /* ========================= 収集元レジストリ ========================= */
 
@@ -129,6 +130,37 @@ function classifyDivision(categoryName, grade, tournament) {
   return "その他";
 }
 
+/* ================== セクション認識付きPDFリンク収集 ================== */
+/**
+ * ページをDOM順に走査し、各PDFリンクに直前の見出し(h1-h4)を「セクション」として付与。
+ * 全競技混在サイト（中体連等）で「バドミントン」見出し配下のPDFだけ拾うために使う。
+ */
+function collectPdfLinksWithSections(html, baseUrl) {
+  const out = [];
+  let section = "";
+  let pageTitle = "";
+  // 見出しとリンクを出現順に抽出（cheerio不要の軽量実装）
+  const re = /<h([1-4])[^>]*>([\s\S]*?)<\/h\1>|<a\s[^>]*href=["']([^"']+)["'][^>]*>([\s\S]*?)<\/a>/gi;
+  const strip = (s) => s.replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim();
+  let m;
+  while ((m = re.exec(html)) !== null) {
+    if (m[1]) { // 見出し
+      const h = strip(m[2]);
+      if (m[1] === "1" && !pageTitle) pageTitle = h;
+      else section = h;
+      continue;
+    }
+    const href = (m[3] || "").trim();
+    if (!/\.pdf(\?.*)?$/i.test(href)) continue;
+    let abs;
+    try { abs = new URL(href, baseUrl).href; } catch { continue; }
+    out.push({ url: abs, text: strip(m[4] || ""), section, pageTitle });
+  }
+  // 重複URL除去（最初の出現＝正しいセクションを優先）
+  const seen = new Set();
+  return out.filter((l) => (seen.has(l.url) ? false : (seen.add(l.url), true)));
+}
+
 /* ============================ PDF1本の処理 ============================ */
 
 async function processPdf(link, opts) {
@@ -167,12 +199,30 @@ async function processPdf(link, opts) {
         };
         return { type: "座標解析(自動)", parsed: parsedB, base, review: rvPath };
       }
-      return { type: cnt ? "座標解析(review待ち)" : "順位情報なし", parsed: null, base, review: rvPath };
+      if (cnt > 0) return { type: "座標解析(review待ち)", parsed: null, base, review: rvPath };
+      // ここまで全滅 → AI読取（ANTHROPIC_API_KEY設定時のみ）
+      const ai = await tryAiRead(buffer, link, "順位情報なし");
+      return ai || { type: "順位情報なし", parsed: null, base, review: rvPath };
     } catch (e) {
-      return { type: `座標解析失敗(${e.message})`, parsed: null, base };
+      const ai = await tryAiRead(buffer, link, `座標解析失敗(${e.message})`);
+      return ai || { type: `座標解析失敗(${e.message})`, parsed: null, base };
     }
   }
-  return { type: "テキスト無し(OCR未導入)", parsed: null, base };
+  // テキスト無し（=スキャン画像でOCRも空振り or 未導入） → AI読取
+  const ai = await tryAiRead(buffer, link, "テキスト無し");
+  return ai || { type: "テキスト無し(OCR/AI読取とも不可)", parsed: null, base };
+
+  async function tryAiRead(buf, lk, reason) {
+    if (!process.env.ANTHROPIC_API_KEY) return null;
+    try {
+      console.log(`    🤖 ${reason} → AI読取を試行: ${base}`);
+      const parsed = await aiReadPdf(buf, { hint: `${lk.pageTitle || ""}${lk.section ? "（" + lk.section + "）" : ""}`.trim() || undefined });
+      if (parsed) return { type: "AI読取", parsed, base };
+    } catch (e) {
+      console.error(`    ⚠ AI読取失敗: ${e.message}`);
+    }
+    return null;
+  }
 }
 
 async function bracketTokens(pdfPath) {
@@ -208,10 +258,20 @@ if (require.main === module) (async () => {
   const opts = {
     safe: args.includes("--safe"),
     only: args.includes("--only") ? args[args.indexOf("--only") + 1] : null, // 例: 小中
+    minYear: args.includes("--all-years") ? 0
+      : args.includes("--min-year") ? Number(args[args.indexOf("--min-year") + 1]) : 2024,
+    append: args.includes("--append"), // 既定は毎回ゼロから再構築（県タグ等の誤りを自己修復）
+  };
+  const isOldLink = (url) => {
+    if (!opts.minYear) return false;
+    const m = decodeURIComponent(url).match(/(20\d{2})/g);
+    if (!m) return false;
+    return Math.max(...m.map(Number)) < opts.minYear; // URL中の最大年が閾値未満なら古い
   };
 
   core.ensureDirs();
-  const data = core.loadData();
+  const data = opts.append ? core.loadData() : [];
+  if (!opts.append) console.log("🧹 data.json をゼロから再構築します（--append で追記モード）");
   const summary = { 小学生: 0, 中学生: 0, 高校生: 0, 社会人: 0, その他: 0 };
   const skipped = [];
 
@@ -257,12 +317,26 @@ if (require.main === module) (async () => {
       }
       // B) リンクされた結果PDFを解析
       if (site.type === "pdf" || site.type === "both") {
-        const links = core.collectPdfLinks(pg.html, pg.url).filter((l) => l.keywordHit);
+        const sportRe = site.sportFilter ? new RegExp(site.sportFilter) : null;
+        const resultRe = /(結果|成績|kekka|result)/i;
+        const links = collectPdfLinksWithSections(pg.html, pg.url).filter((l) => {
+          const hay = `${l.section}｜${l.text}｜${decodeURIComponent(l.url)}`;
+          if (sportRe && !sportRe.test(hay)) return false;      // 競技フィルタ（見出し文脈込み）
+          if (!resultRe.test(hay)) return false;                 // 結果もの限定
+          if (isOldLink(l.url)) return false;                    // 古い年度は除外
+          return true;
+        });
         for (const link of links) {
           await core.sleep(core.CONFIG.requestDelayMs);
           try {
             const r = await processPdf(link, opts);
             if (!r.parsed) { skipped.push(`${r.base} … ${r.type}`); continue; }
+            // PDF内から大会名が取れなかったら、掲載ページのタイトル＋セクションで補完
+            if (/大会名不明/.test(r.parsed.tournament) && (link.pageTitle || link.section)) {
+              const t = `${link.pageTitle || ""}${link.section ? "（" + link.section + "）" : ""}`.trim();
+              r.parsed.tournament = t;
+              r.parsed.categories.forEach((c) => c.players.forEach((p) => (p.tournament = t)));
+            }
             if (!applyAndMerge(r.parsed, r.type, site.pref)) skipped.push(`${r.base} … 対象区分なし`);
           } catch (e) {
             skipped.push(`${link.url.split("/").pop()} … エラー(${e.message})`);
@@ -284,4 +358,4 @@ if (require.main === module) (async () => {
   console.log("\n📦 output/data.json をフロントHTMLと同じ場所に置くか、アプリの「data.json読込」で選択。");
 })().catch((e) => { console.error("❌", e); process.exit(1); });
 
-module.exports = { classifyDivision, extractFromHtmlText, collectSubPages, loadSources };
+module.exports = { classifyDivision, extractFromHtmlText, collectSubPages, loadSources, collectPdfLinksWithSections };
