@@ -1,0 +1,33 @@
+# 全国バドミントン成績 自動収集（週1回、クラウドで実行。手元作業ゼロ）
+name: collect-badminton-results
+on:
+  schedule:
+    - cron: "0 21 * * 5"   # 毎週土曜 朝6時(JST)
+  workflow_dispatch: {}     # 手動実行ボタンも使える
+permissions:
+  contents: write
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: install deps (OCR含む)
+        working-directory: backend
+        run: |
+          npm install
+          npm install tesseract.js pdf-to-img
+      - name: collect (全国巡回 → data.json)
+        working-directory: backend
+        run: node auto.js
+      - name: publish data.json to site root
+        run: cp backend/output/data.json ./data.json
+      - name: commit & push
+        run: |
+          git config user.name "collector-bot"
+          git config user.email "bot@users.noreply.github.com"
+          git add data.json backend/output || true
+          git diff --cached --quiet || git commit -m "auto: update tournament data ($(date +%F))"
+          git push
