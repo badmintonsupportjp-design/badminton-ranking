@@ -1,295 +1,535 @@
 /**
- * auto.js — ワンコマンド全自動パイプライン
+ * バドミントン大会結果 自動収集バックエンド
  * ------------------------------------------------------------
- *   node auto.js
+ * 1. 対象サイトをスクレイピングして大会結果PDFのリンクを収集
+ * 2. 最新PDFをダウンロード
+ * 3. pdf-parse でテキスト抽出し、カテゴリ・順位・選手・チームを解析
+ * 4. output/data.json に統合保存（フロントエンドがこれを読み込む）
  *
- * これ1本で全部やる:
- *   1. 対象サイト（R7/R8 大会予定と結果）を巡回し結果PDFを全取得
- *   2. PDFタイプを自動判定して処理
- *      - 一覧形式        → そのまま解析して取込
- *      - 画像スキャン     → OCR（tesseract.js日本語）して解析・取込
- *      - トーナメント表   → 座標解析（bracket.js）で優勝/3位を復元して取込
- *   3. カテゴリを区分（小学生/中学生/高校生/社会人/その他）に自動分類
- *   4. output/data.json に統合保存（小中学生を優先表示するサマリを出力）
+ * 使い方:
+ *   npm install
+ *   node index.js                              … サイト巡回 → PDF取得 → 解析 → data.json 更新
+ *   node index.js --pdf ./results.pdf          … 手元のPDFを解析して data.json に追加
+ *   node index.js --pdf ./r.pdf --year 2025 --tournament 春季大会
  *
- * オプション:
- *   --safe            トーナメント座標解析の自動取込を止め、review出力のみにする
- *   --only 小中       小学生・中学生の大会だけ取込む（既定は全区分取込）
+ * 【実サイト調査に基づく注意】nagano-badminton.com の結果PDFは3タイプ混在:
+ *   A) 順位一覧形式（例: 全信州選手権 -allshinsyu-k.pdf）→ 本プログラムで解析可
+ *   B) トーナメント表のテキストPDF → 列順が崩れ順位復元不可（要レイアウト解析）
+ *   C) スキャン画像PDF（例: 中学春季 -syunki-k-a.pdf）→ pdf-parseではテキスト0。
+ *      OCRが必要な場合は tesseract.js + pdf-to-img 等を追加導入すること。
  *
- * 事前準備（初回のみ）:
- *   npm install                       … 必須依存（axios/cheerio/pdf-parse/pdf2json）
- *   npm i tesseract.js pdf-to-img     … 画像PDFのOCRを有効化（推奨）
+ * 【完全収録ワークフロー】
+ *   タイプA: node index.js                     … 一覧形式PDFを自動取込
+ *   タイプB: node bracket.js <pdf> --year ...  … 座標解析→review出力→目視確認
+ *            node index.js --import output/review-*.json … 確定分を取込
+ *   タイプC: npm i tesseract.js pdf-to-img → node index.js … 画像PDFをOCR自動取込
+ *   最後に output/data.json をフロントHTMLと同じ場所に置く（またはアプリの
+ *   「data.json読込」ボタンで選択）
  */
 
 "use strict";
 
 const fs = require("fs");
 const path = require("path");
-const core = require("./index.js");
-const bracket = require("./bracket.js");
+// 重い依存は使用時に読込（--import はネット系依存なしで動く）
+const lazy = (name) => { let m; return () => (m ??= require(name)); };
+const axios = lazy("axios");
+const cheerio = lazy("cheerio");
+const pdfParse = lazy("pdf-parse");
 
-/* ========================= 収集元レジストリ ========================= */
+/* ============================== 設定 ============================== */
 
-function loadSources() {
-  const p = path.join(__dirname, "sources.json");
-  if (fs.existsSync(p)) {
-    const j = JSON.parse(fs.readFileSync(p, "utf-8"));
-    return j.sources || [];
+const CONFIG = {
+  // 巡回対象サイト（必要に応じて追加）
+  // ※長野県協会は結果PDFがトップではなく年度別「大会予定と結果」ページに掲載される
+  targetSites: [
+    {
+      name: "長野県バドミントン協会 R8(2026年度) 大会予定と結果",
+      url: "http://www.nagano-badminton.com/yotei-kekka/2026/R8taikai-kekka.html",
+    },
+    {
+      name: "長野県バドミントン協会 R7(2025年度) 大会予定と結果",
+      url: "http://www.nagano-badminton.com/yotei-kekka/2025/R7taikai-kekka.html",
+    },
+  ],
+  // PDFリンクとして採用するキーワード（リンクテキスト or URL に含まれる語）
+  // このサイトの結果PDFは URL 末尾が「-k.pdf」「-kekka.pdf」の命名が多い
+  pdfKeywords: ["結果", "成績", "kekka", "-k.pdf", "-k-a.pdf"],
+  // 1サイトあたり取得する最新PDFの最大数
+  maxPdfPerSite: 5,
+  // リクエスト間隔（相手サーバーへの負荷軽減。必ず1秒以上を推奨）
+  requestDelayMs: 1500,
+  timeoutMs: 20000,
+  userAgent:
+    "Mozilla/5.0 (compatible; BadmintonResultsCollector/1.0; +local-script)",
+
+  pdfDir: path.join(__dirname, "pdfs"),
+  outDir: path.join(__dirname, "output"),
+  dataFile: path.join(__dirname, "output", "data.json"),
+};
+
+/* ============================ ユーティリティ ============================ */
+
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+function ensureDirs() {
+  for (const d of [CONFIG.pdfDir, CONFIG.outDir]) {
+    if (!fs.existsSync(d)) fs.mkdirSync(d, { recursive: true });
   }
-  // フォールバック: index.js の CONFIG
-  return core.CONFIG.targetSites.map((s) => ({ ...s, pref: "長野県", type: "pdf", depth: 0 }));
 }
 
-/** 同一ドメインの「結果/大会」系リンクを1階層たどる */
-function collectSubPages(html, baseUrl) {
-  const cheerio = require("cheerio");
-  const $ = cheerio.load(html);
-  const base = new URL(baseUrl);
-  const out = new Set();
+function zenToHan(str) {
+  // 全角数字・英字 → 半角
+  return str
+    .replace(/[０-９Ａ-Ｚａ-ｚ]/g, (c) =>
+      String.fromCharCode(c.charCodeAt(0) - 0xfee0)
+    )
+    .replace(/　/g, " ");
+}
+
+/* ========================= 1. サイトスクレイピング ========================= */
+
+async function fetchHtml(url) {
+  const res = await axios().get(url, {
+    timeout: CONFIG.timeoutMs,
+    responseType: "arraybuffer",
+    headers: { "User-Agent": CONFIG.userAgent },
+  });
+  // 文字コードはサイトにより異なるため、まずUTF-8として解釈（必要ならiconv-lite導入）
+  return res.data.toString("utf-8");
+}
+
+/** ページ内の <a href="*.pdf"> を収集し、キーワードで絞り込む */
+function collectPdfLinks(html, baseUrl) {
+  const $ = cheerio().load(html);
+  const links = [];
   $("a[href]").each((_, el) => {
     const href = ($(el).attr("href") || "").trim();
-    const text = $(el).text();
-    if (/\.(pdf|xlsx?|docx?|jpe?g|png|zip)(\?|$)/i.test(href)) return;
+    if (!/\.pdf(\?.*)?$/i.test(href)) return;
     let abs;
-    try { abs = new URL(href, baseUrl); } catch { return; }
-    if (abs.hostname !== base.hostname) return;
-    if (/(結果|大会|kekka|result|taikai|20\d{2})/i.test(text + abs.pathname)) out.add(abs.href);
+    try {
+      abs = new URL(href, baseUrl).href;
+    } catch {
+      return;
+    }
+    const text = $(el).text().trim();
+    const hit = CONFIG.pdfKeywords.some(
+      (kw) => text.includes(kw) || decodeURIComponent(abs).includes(kw)
+    );
+    links.push({ url: abs, text, keywordHit: hit });
   });
-  return [...out].slice(0, 20); // 1サイトあたり上限
+  // キーワード一致を優先し、ページ内出現順（新着が上にある想定）を維持
+  const unique = [...new Map(links.map((l) => [l.url, l])).values()];
+  unique.sort((a, b) => Number(b.keywordHit) - Number(a.keywordHit));
+  return unique;
 }
 
-/** HTMLページ本文から「◆種目名 → 優勝/第N位: 名前」形式の結果を抽出 */
-function htmlToLines(html) {
-  try {
-    const cheerio = require("cheerio");
-    const $ = cheerio.load(html);
-    $("script,style,nav,footer").remove();
-    // ブロック要素境界を改行に
-    return $("body").html()
-      .replace(/<(br|\/p|\/div|\/li|\/h[1-6]|\/tr|\/td)[^>]*>/gi, "\n")
-      .replace(/<[^>]+>/g, "")
-      .split(/\n/);
-  } catch {
-    // cheerio未導入でも動くフォールバック
-    return html
-      .replace(/<script[\s\S]*?<\/script>|<style[\s\S]*?<\/style>/gi, "")
-      .replace(/<(br|\/p|\/div|\/li|\/h[1-6]|\/tr|\/td)[^>]*>/gi, "\n")
-      .replace(/<[^>]+>/g, "")
-      .split(/\n/);
+async function downloadPdf(url) {
+  const res = await axios().get(url, {
+    timeout: CONFIG.timeoutMs,
+    responseType: "arraybuffer",
+    headers: { "User-Agent": CONFIG.userAgent },
+  });
+  const fileName =
+    decodeURIComponent(url.split("/").pop().split("?")[0]) || `dl_${Date.now()}.pdf`;
+  const filePath = path.join(CONFIG.pdfDir, fileName);
+  fs.writeFileSync(filePath, res.data);
+  return { filePath, buffer: Buffer.from(res.data) };
+}
+
+/* =========================== 2. PDF解析ロジック =========================== */
+
+/** 年度抽出: 「2025年度」「令和7年」等に対応 */
+function extractYear(text) {
+  const m1 = text.match(/(20\d{2})\s*年/);
+  if (m1) return Number(m1[1]);
+  const m2 = text.match(/令和\s*(元|\d+)\s*年/);
+  if (m2) return 2018 + (m2[1] === "元" ? 1 : Number(m2[1]));
+  return new Date().getFullYear();
+}
+
+/** 大会名抽出: 「大会」「選手権」等を含む最初の行を採用 */
+function extractTournament(text) {
+  const line = text
+    .split(/\r?\n/)
+    .map((l) => l.trim())
+    .find((l) => l.length >= 4 && l.length <= 50 && /(大会|選手権|オープン|カップ|リーグ|新人戦)/.test(l));
+  return line || "大会名不明";
+}
+
+// カテゴリ行: 例「中3男子シングルス」「小学5年女子」「一般男子ダブルス」
+const CATEGORY_RE =
+  /((?:小(?:学)?|中(?:学)?|高(?:校)?)\s*\d?\s*年?|一般|シニア)?\s*(男子|女子|混合)\s*(シングルス|ダブルス|単|複)?/;
+
+// 順位表現: 優勝 / 準優勝 / 第3位 / 3位 / ベスト8
+const RANK_RE = /(準\s*優\s*勝|優\s*勝|第?\s*(\d{1,2})\s*位|ベスト\s*(\d{1,2}))/;
+
+// 「氏名（チーム名）」の抽出
+const NAME_TEAM_RE =
+  /([一-龠々〆ヵヶぁ-んァ-ヴa-zA-Z]+(?:[ 　][一-龠々〆ヵヶぁ-んァ-ヴa-zA-Z]+)*)\s*[（(]([^（()）]+)[）)]/g;
+
+function rankValue(rankText) {
+  const t = rankText.replace(/\s/g, "");
+  if (t.includes("優勝") && !t.includes("準")) return 1;
+  if (t.includes("準優勝")) return 2;
+  const pos = rankText.match(/(\d{1,2})\s*位/);
+  if (pos) return Number(pos[1]);
+  const best = rankText.match(/ベスト\s*(\d{1,2})/);
+  if (best) return Number(best[1]);
+  return 99;
+}
+
+function parseCategoryName(raw) {
+  const name = zenToHan(raw).replace(/\s+/g, "");
+  const gender = name.includes("男子")
+    ? "男子"
+    : name.includes("女子")
+    ? "女子"
+    : name.includes("混合")
+    ? "混合"
+    : "不明";
+  const g = name.match(/(小|中|高)(?:学|校)?(\d)/);
+  const grade = g ? `${g[1]}${g[2]}` : name.includes("一般") ? "一般" : "不明";
+  return { name, gender, grade };
+}
+
+/** 行がカテゴリ見出しかどうか（順位語や氏名括弧を含まない短い行） */
+function isCategoryLine(line) {
+  return (
+    line.length <= 20 &&
+    /(男子|女子|混合)/.test(line) &&
+    !RANK_RE.test(line) &&
+    !/[（(]/.test(line)
+  );
+}
+
+/**
+ * 最終順位・総合順位の1行表記を解析
+ * 例: 「最終順位　1位中野フレア　2位　山室中部スポ少　３位　ASTROBALS・パルセイロユース」
+ */
+function parseFinalRankLine(rawLine) {
+  if (!/(最終順位|総合順位)/.test(rawLine)) return null;
+  const s = zenToHan(rawLine);
+  const out = [];
+  const re = /(\d)\s*位\s*[:：]?\s*(.+?)(?=\s*\d\s*位|$)/g;
+  let m;
+  while ((m = re.exec(s)) !== null) {
+    for (const nm of m[2].split(/[・、,／/]/)) {
+      const name = nm.trim();
+      if (name.length >= 2 && name.length <= 25 && !/[()（）\d]{3,}/.test(name)) {
+        out.push({ name, team: "", rank: Number(m[1]) });
+      }
+    }
   }
+  return out.length ? out : null;
 }
 
-function extractFromHtmlText(html, meta) {
-  const rawLines = htmlToLines(html);
-  const lines = rawLines.map((l) => l.replace(/&nbsp;|＆nbsp;/g, " ").replace(/\s+/g, " ").trim()).filter(Boolean);
-  const text = lines.join("\n");
+const SCORE_RE = /\d+\s*[-ー−]\s*\d+/;
 
-  const CAT = /(男子|女子|混合).{0,10}(シングルス|ダブルス|団体|単|複)|(シングルス|ダブルス|団体戦?)\s*(男子|女子)?/;
-  const RANK = /^[・･\-*＊◦]?\s*(優\s*勝|準優勝|第?\s*([1-8１-８])\s*位)\s*[：:]\s*(.+)$/;
+/**
+ * PDFテキスト → { year, tournament, categories[] }
+ * 3段構えで解析する:
+ *   A. 順位一覧形式（優勝/第N位 + 氏名（所属）または チーム名のみ）
+ *   B. 「最終順位」1行表記
+ *   C. トーナメント表: エントリ「氏名（所属）」が所属なしで再登場する回数を数え、
+ *      最多＝最も勝ち上がった者を優勝と判定（曖昧なら不採用）。
+ *      「三位決定戦」直後に再登場するエントリ名は3位。
+ * 精度が足りない場合は CATEGORY_RE / RANK_RE を対象PDFに合わせて調整する。
+ */
+function extractResults(rawText, overrides = {}) {
+  const text = zenToHan(rawText);
+  const year = overrides.year || extractYear(text);
+  const tournament = overrides.tournament || extractTournament(text);
 
-  const cats = new Map();
-  let cur = null;
-  const tournament = meta.tournament ||
-    lines.find((l) => l.length >= 6 && l.length <= 60 && /(大会|選手権|カップ|予選)/.test(l)) || "大会名不明";
+  const categories = new Map();
+  let current = null;
+  const getCat = (name) => {
+    if (!categories.has(name)) categories.set(name, { ...parseCategoryName(name), players: [] });
+    return categories.get(name);
+  };
 
-  for (const line of lines) {
-    if (line.length <= 30 && /^[◆■▼<＜(（]?/.test(line) && CAT.test(line) && !RANK.test(line)) {
-      const name = line.replace(/^[◆■▼<＜(（\s]+|[>＞)）\s]+$/g, "");
-      if (!cats.has(name)) cats.set(name, { name, gender: /女子/.test(name) ? "女子" : /男子/.test(name) ? "男子" : "不明", grade: "不明", players: [] });
-      cur = cats.get(name);
+  // ---- ブラケット解析用の記録 ----
+  // entries: name -> { team, cat }  /  bare: name -> 再登場回数  /  third: Set(name)
+  const entries = new Map();
+  const bare = new Map();
+  const thirdWinners = new Set();
+  let pendingThird = 0; // 「三位決定戦」検出後の探索残り行数
+
+  const lines = text.split(/\r?\n/);
+  for (const rawLine of lines) {
+    const line = rawLine.trim();
+    if (!line) continue;
+
+    // カテゴリ見出し
+    if (isCategoryLine(line) && CATEGORY_RE.test(line)) {
+      current = getCat(zenToHan(line).replace(/\s+/g, ""));
       continue;
     }
-    const m = line.match(RANK);
-    if (!m || !cur) continue;
-    const rank = /優\s*勝/.test(m[1]) && !/準/.test(m[1]) ? 1 : /準優勝/.test(m[1]) ? 2 : Number(String(m[2]).replace(/[１-８]/g, (c) => String.fromCharCode(c.charCodeAt(0) - 0xfee0)));
-    // 「名前（所属）」or チーム名のみ の両対応。複数名は ・、/ 区切り
-    for (const part of m[3].split(/[、,／/]|・(?=[^）)]*([（(]|$))/).filter(Boolean)) {
-      if (typeof part !== "string" || part.length < 2 || part.length > 30) continue;
-      const nm = part.match(/^(.{2,20}?)\s*[（(]([^（()）]+)[）)]/);
-      cur.players.push(nm
-        ? { name: nm[1].trim(), team: nm[2].trim(), tournament, rank }
-        : { name: part.trim(), team: "", tournament, rank });
+
+    // B. 最終順位1行表記
+    const finals = parseFinalRankLine(line);
+    if (finals) {
+      const cat = current || getCat("総合成績");
+      for (const f of finals) cat.players.push({ ...f, tournament });
+      continue;
     }
-  }
-  return {
-    year: meta.year || yearFromText(text),
-    tournament,
-    categories: [...cats.values()].filter((c) => c.players.length),
-  };
-}
 
-/* ========================= 区分（部門）分類 ========================= */
+    // 三位決定戦マーカー
+    if (/三位決定戦/.test(line)) { pendingThird = 6; }
 
-function classifyDivision(categoryName, grade, tournament) {
-  const s = `${categoryName}｜${grade || ""}｜${tournament || ""}`;
-  if (/(中学|中\d|ジュニアオープン)/.test(s)) return "中学生";
-  if (/(小学|エレメンタリー|学年別|若葉|ＡＢＣ|ABC|プレゴールデン|スポ少)/.test(s)) return "小学生";
-  if (/(高校|少年|高\d|インターハイ|高等学校)/.test(s)) return "高校生";
-  if (/(一般|社会人|レディース|マスター|シニア|実業団|県リーグ|クラブ対抗|都道府県対抗|全信州)/.test(s)) return "社会人";
-  return "その他";
-}
+    // 順位語を行から除去した残り（氏名抽出はこちらで行う）
+    const RANK_G = new RegExp(RANK_RE.source, "g");
+    const stripped = line.replace(RANK_G, " ").replace(/\s+/g, " ").trim();
 
-/* ============================ PDF1本の処理 ============================ */
-
-async function processPdf(link, opts) {
-  const { filePath, buffer } = await core.downloadPdf(link.url);
-  const base = path.basename(filePath);
-
-  // まずテキスト抽出（内部でOCRフォールバックあり）
-  const text = await core.parsePdfSmart(buffer);
-  if (text && text.replace(/\s/g, "").length >= 50) {
-    // 一覧形式として解析
-    const parsed = core.extractResults(text);
-    const n = parsed.categories.reduce((s, c) => s + c.players.length, 0);
-    if (n > 0) return { type: "一覧/OCR", parsed, base };
-
-    // 一覧で拾えない＝トーナメント表の可能性 → 座標解析
-    try {
-      const pages = await bracketTokens(filePath);
-      const result = bracket.analyze(pages);
-      const review = bracket.toReview(result, {
-        year: yearFromText(text),
-        tournament: tournamentFromText(text) || base,
-      });
-      // 監査用に必ずreviewを保存
-      const rvPath = path.join(core.CONFIG.outDir, `review-${base.replace(/\.pdf$/i, "")}.json`);
-      fs.writeFileSync(rvPath, JSON.stringify(review, null, 2), "utf-8");
-
-      const cnt = review.categories.reduce((s, c) => s + c.players.length, 0);
-      if (cnt > 0 && !opts.safe) {
-        const parsedB = {
-          year: review.year,
-          tournament: review.tournament,
-          categories: review.categories
-            .map((c) => ({ name: c.name, gender: c.gender, grade: c.grade,
-              players: c.players.map(({ _evidence, ...p }) => p) }))
-            .filter((c) => c.players.length),
-        };
-        return { type: "座標解析(自動)", parsed: parsedB, base, review: rvPath };
-      }
-      return { type: cnt ? "座標解析(review待ち)" : "順位情報なし", parsed: null, base, review: rvPath };
-    } catch (e) {
-      return { type: `座標解析失敗(${e.message})`, parsed: null, base };
+    // エントリ登録: 氏名（所属）
+    let em; let hadEntry = false;
+    NAME_TEAM_RE.lastIndex = 0;
+    while ((em = NAME_TEAM_RE.exec(stripped)) !== null) {
+      const nm = em[1].replace(/\s+/g, " ").trim();
+      if (nm.length < 2 || /(位|優勝|ベスト|リーグ|決定戦)/.test(nm.replace(/\s/g, ""))) continue;
+      hadEntry = true;
+      if (!entries.has(nm)) entries.set(nm, { team: em[2].trim(), cat: current });
     }
-  }
-  return { type: "テキスト無し(OCR未導入)", parsed: null, base };
-}
 
-async function bracketTokens(pdfPath) {
-  // bracket.js の loadTokens を経由（pdf2json必須）
-  const PDFParser = require("pdf2json");
-  return new Promise((resolve, reject) => {
-    const parser = new PDFParser();
-    parser.on("pdfParser_dataError", (e) => reject(e.parserError || e));
-    parser.on("pdfParser_dataReady", (data) => {
-      resolve((data.Pages || []).map((page, pi) =>
-        (page.Texts || []).map((t) => ({
-          page: pi, x: t.x, y: t.y,
-          text: decodeURIComponent(t.R.map((r) => r.T).join("")).trim(),
-        })).filter((t) => t.text)));
-    });
-    parser.loadPDF(pdfPath);
-  });
-}
-
-const yearFromText = (t) => {
-  const m1 = t.match(/(20\d{2})\s*年/); if (m1) return Number(m1[1]);
-  const m2 = t.match(/令和\s*(元|\d+)\s*年/); if (m2) return 2018 + (m2[1] === "元" ? 1 : Number(m2[1]));
-  return new Date().getFullYear();
-};
-const tournamentFromText = (t) =>
-  t.split(/\r?\n/).map((l) => l.trim())
-   .find((l) => l.length >= 4 && l.length <= 50 && /(大会|選手権|オープン|カップ|リーグ|新人戦)/.test(l));
-
-/* =============================== メイン =============================== */
-
-if (require.main === module) (async () => {
-  const args = process.argv.slice(2);
-  const opts = {
-    safe: args.includes("--safe"),
-    only: args.includes("--only") ? args[args.indexOf("--only") + 1] : null, // 例: 小中
-    minYear: args.includes("--all-years") ? 0
-      : args.includes("--min-year") ? Number(args[args.indexOf("--min-year") + 1]) : 2024,
-  };
-  const isOldLink = (url) => {
-    if (!opts.minYear) return false;
-    const m = decodeURIComponent(url).match(/(20\d{2})/g);
-    if (!m) return false;
-    return Math.max(...m.map(Number)) < opts.minYear; // URL中の最大年が閾値未満なら古い
-  };
-
-  core.ensureDirs();
-  const data = core.loadData();
-  const summary = { 小学生: 0, 中学生: 0, 高校生: 0, 社会人: 0, その他: 0 };
-  const skipped = [];
-
-  const applyAndMerge = (parsed, srcTag, pref) => {
-    parsed.categories = parsed.categories
-      .map((c) => ({ ...c, pref, division: classifyDivision(c.name, c.grade, parsed.tournament) }))
-      .filter((c) => {
-        if (!opts.only) return true;
-        if (opts.only === "小中") return c.division === "小学生" || c.division === "中学生";
-        return c.division === opts.only;
-      });
-    const n = parsed.categories.reduce((s, c) => s + c.players.length, 0);
-    if (!n) return 0;
-    core.mergeIntoData(data, parsed);
-    parsed.categories.forEach((c) => (summary[c.division] += c.players.length));
-    console.log(`  ✅ [${srcTag}] ${parsed.tournament} → ${n}名取込`);
-    return n;
-  };
-
-  for (const site of loadSources()) {
-    console.log(`\n🔍 巡回: ${site.name}（${site.pref}）`);
-    let html;
-    try { html = await core.fetchHtml(site.url); }
-    catch (e) { console.error(`  ⚠ サイト取得失敗: ${e.message}`); continue; }
-
-    // 対象ページ一覧（入口 + 深さ1）
-    const pages = [{ url: site.url, html }];
-    if ((site.depth || 0) >= 1) {
-      for (const sub of collectSubPages(html, site.url)) {
-        await core.sleep(core.CONFIG.requestDelayMs);
-        try { pages.push({ url: sub, html: await core.fetchHtml(sub) }); } catch {}
+    // A. 順位行
+    const rankMatch = line.match(RANK_RE);
+    if (rankMatch && current) {
+      const rank = rankValue(rankMatch[0]);
+      let matched = false;
+      let m2;
+      NAME_TEAM_RE.lastIndex = 0;
+      while ((m2 = NAME_TEAM_RE.exec(stripped)) !== null) {
+        const name = m2[1].replace(/\s+/g, " ").trim();
+        const team = m2[2].trim();
+        if (name.length < 2 || /(位|優勝|ベスト)/.test(name.replace(/\s/g, ""))) continue;
+        current.players.push({ name, team, tournament, rank });
+        matched = true;
       }
-    }
-    console.log(`  🌐 対象ページ ${pages.length} 件`);
-
-    for (const pg of pages) {
-      // A) HTML本文から順位を直接抽出
-      if (site.type === "html" || site.type === "both") {
-        try {
-          const parsed = extractFromHtmlText(pg.html, {});
-          if (parsed.categories.length) applyAndMerge(parsed, "HTML", site.pref);
-        } catch (e) { skipped.push(`${pg.url} … HTML解析エラー(${e.message})`); }
-      }
-      // B) リンクされた結果PDFを解析
-      if (site.type === "pdf" || site.type === "both") {
-        const links = core.collectPdfLinks(pg.html, pg.url).filter((l) => l.keywordHit && !isOldLink(l.url));
-        for (const link of links) {
-          await core.sleep(core.CONFIG.requestDelayMs);
-          try {
-            const r = await processPdf(link, opts);
-            if (!r.parsed) { skipped.push(`${r.base} … ${r.type}`); continue; }
-            if (!applyAndMerge(r.parsed, r.type, site.pref)) skipped.push(`${r.base} … 対象区分なし`);
-          } catch (e) {
-            skipped.push(`${link.url.split("/").pop()} … エラー(${e.message})`);
-          }
+      // 括弧なし（チーム名だけ）の順位行: 「優勝 小布施ジュニア」
+      if (!matched && !SCORE_RE.test(line) && !/[（(]/.test(stripped)) {
+        const rest = stripped.replace(/^[  :：・･、]+/, "").trim();
+        if (rest.length >= 2 && rest.length <= 25 && !/^\d+$/.test(rest)) {
+          current.players.push({ name: rest, team: "", tournament, rank });
         }
       }
+      continue;
+    }
+
+    // C. 所属なし再登場のカウント（ブラケット勝ち上がり）
+    if (!hadEntry && !/[（(]/.test(line)) {
+      for (const token of line.split(/[ 　]+/)) {
+        const nm = token.trim();
+        if (!entries.has(nm)) continue;
+        if (pendingThird > 0) {
+          thirdWinners.add(nm); // 3位決定戦の勝者候補は優勝カウントに入れない
+        } else {
+          bare.set(nm, (bare.get(nm) || 0) + 1);
+        }
+      }
+      if (pendingThird > 0) pendingThird--;
     }
   }
 
-  core.saveData(data);
-  console.log("\n===== 取込サマリ（区分別） =====");
-  console.log(`  小学生: ${summary["小学生"]}名 / 中学生: ${summary["中学生"]}名  ← メイン`);
-  console.log(`  高校生: ${summary["高校生"]}名 / 社会人: ${summary["社会人"]}名 / その他: ${summary["その他"]}名`);
-  if (skipped.length) {
-    console.log("\n----- 未取込（要確認） -----");
-    skipped.forEach((s) => console.log("  ・" + s));
-    console.log("  ※ review-*.json があるものは中身を確認して `node index.js --import` で確定可");
+  // ---- C. ブラケット判定の確定（明示順位が無いカテゴリのみ） ----
+  const byCat = new Map(); // cat -> [{name, count}]
+  for (const [nm, cnt] of bare) {
+    const e = entries.get(nm);
+    const cat = e.cat || getCat("総合成績");
+    if (!byCat.has(cat)) byCat.set(cat, []);
+    byCat.get(cat).push({ name: nm, team: e.team, count: cnt });
   }
-  console.log("\n📦 output/data.json をフロントHTMLと同じ場所に置くか、アプリの「data.json読込」で選択。");
-})().catch((e) => { console.error("❌", e); process.exit(1); });
+  for (const [cat, list] of byCat) {
+    if (cat.players.some((p) => p.rank === 1)) continue; // 明示順位があるなら触らない
+    list.sort((a, b) => b.count - a.count);
+    const max = list[0].count;
+    const top = list.filter((x) => x.count === max);
+    const second = list.find((x) => x.count < max);
+    // 単複対応: 最多再登場が1〜2名で、次点と差があるときだけ優勝と判定
+    if (top.length <= 2 && (!second || max - second.count >= 1)) {
+      for (const t of top) cat.players.push({ name: t.name, team: t.team, tournament, rank: 1 });
+    }
+    for (const nm of thirdWinners) {
+      const e = entries.get(nm);
+      if (e && e.cat === cat && !top.some((t) => t.name === nm)) {
+        cat.players.push({ name: nm, team: e.team, tournament, rank: 3 });
+      }
+    }
+  }
 
-module.exports = { classifyDivision, extractFromHtmlText, collectSubPages, loadSources };
+  return {
+    year,
+    tournament,
+    categories: [...categories.values()].filter((c) => c.players.length > 0),
+  };
+}
+
+/* =========================== 3. data.json 統合 =========================== */
+
+function loadData() {
+  try {
+    return JSON.parse(fs.readFileSync(CONFIG.dataFile, "utf-8"));
+  } catch {
+    return [];
+  }
+}
+
+/** 抽出結果を既存 data.json にマージ（年度→カテゴリ名でまとめ、重複選手は除外） */
+function mergeIntoData(data, parsed) {
+  let yearEntry = data.find((d) => d.year === parsed.year);
+  if (!yearEntry) {
+    yearEntry = { year: parsed.year, categories: [] };
+    data.push(yearEntry);
+  }
+  for (const cat of parsed.categories) {
+    let catEntry = yearEntry.categories.find((c) => c.name === cat.name);
+    if (!catEntry) {
+      catEntry = { name: cat.name, gender: cat.gender, grade: cat.grade, players: [] };
+      yearEntry.categories.push(catEntry);
+    }
+    for (const p of cat.players) {
+      const dup = catEntry.players.some(
+        (q) => q.name === p.name && q.team === p.team && q.tournament === p.tournament
+      );
+      if (!dup) catEntry.players.push(p);
+    }
+  }
+  data.sort((a, b) => b.year - a.year);
+  return data;
+}
+
+function saveData(data) {
+  fs.writeFileSync(CONFIG.dataFile, JSON.stringify(data, null, 2), "utf-8");
+  console.log(`✅ 保存: ${CONFIG.dataFile}`);
+}
+
+/* ============================== 実行フロー ============================== */
+
+async function parsePdfSmart(buffer) {
+  // 1) 通常のテキスト抽出
+  const pdf = await pdfParse()(buffer);
+  if ((pdf.text || "").replace(/\s/g, "").length >= 50) return pdf.text;
+
+  // 2) テキストがほぼ無い＝スキャン画像PDF → OCRフォールバック
+  //    npm install tesseract.js pdf-to-img を実行しておくと自動で有効になる
+  //    （tesseract.js は初回に日本語データ jpn.traineddata を自動DLする）
+  console.log("    ℹ テキスト無しPDF。OCRを試行します…");
+  try {
+    const { pdf: pdfToImg } = await import("pdf-to-img");
+    const { createWorker } = await import("tesseract.js");
+    const worker = await createWorker("jpn");
+    let text = "";
+    const doc = await pdfToImg(buffer, { scale: 3 }); // 高解像度化でOCR精度向上
+    for await (const page of doc) {
+      const { data } = await worker.recognize(page);
+      text += data.text + "\n";
+    }
+    await worker.terminate();
+    return text;
+  } catch (e) {
+    console.error(
+      "    ⚠ OCR不可: `npm install tesseract.js pdf-to-img` を実行してください。" +
+        ` (${e.message})`
+    );
+    return "";
+  }
+}
+
+async function runScrapePipeline() {
+  ensureDirs();
+  const data = loadData();
+
+  for (const site of CONFIG.targetSites) {
+    console.log(`\n🔍 巡回: ${site.name} (${site.url})`);
+    let html;
+    try {
+      html = await fetchHtml(site.url);
+    } catch (e) {
+      console.error(`  ⚠ サイト取得失敗: ${e.message}`);
+      continue;
+    }
+
+    const links = collectPdfLinks(html, site.url).slice(0, CONFIG.maxPdfPerSite);
+    console.log(`  📄 PDFリンク ${links.length} 件を検出`);
+
+    for (const link of links) {
+      await sleep(CONFIG.requestDelayMs);
+      try {
+        console.log(`  ⬇ ダウンロード: ${link.text || link.url}`);
+        const { filePath, buffer } = await downloadPdf(link.url);
+        const text = await parsePdfSmart(buffer);
+        const parsed = extractResults(text);
+        const count = parsed.categories.reduce((s, c) => s + c.players.length, 0);
+        console.log(
+          `    → ${parsed.year}年 / ${parsed.tournament} / カテゴリ${parsed.categories.length} / 選手${count}名 (${path.basename(filePath)})`
+        );
+        if (count > 0) mergeIntoData(data, parsed);
+      } catch (e) {
+        console.error(`    ⚠ 解析失敗: ${e.message}`);
+      }
+    }
+  }
+
+  saveData(data);
+}
+
+async function runImport(reviewPath) {
+  const raw = JSON.parse(fs.readFileSync(reviewPath, "utf-8"));
+  // review特有のメタキーを除去して確定データだけ取り込む
+  const parsed = {
+    year: raw.year,
+    tournament: raw.tournament,
+    categories: (raw.categories || [])
+      .map((c) => ({
+        name: c.name, gender: c.gender, grade: c.grade,
+        players: (c.players || []).map(({ _evidence, ...p }) => p),
+      }))
+      .filter((c) => c.players.length > 0),
+  };
+  const count = parsed.categories.reduce((s, c) => s + c.players.length, 0);
+  if (!count) { console.error("⚠ 取込対象0件（players が空）"); return; }
+  ensureDirs();
+  const data = mergeIntoData(loadData(), parsed);
+  saveData(data);
+  console.log(`✅ ${parsed.year}年 / ${parsed.tournament} / ${count}名を取込`);
+}
+
+async function runLocalPdf(pdfPath, overrides) {
+  ensureDirs();
+  const buffer = fs.readFileSync(pdfPath);
+  const text = await parsePdfSmart(buffer);
+  const parsed = extractResults(text, overrides);
+  const data = mergeIntoData(loadData(), parsed);
+  console.log(JSON.stringify(parsed, null, 2));
+  saveData(data);
+}
+
+/* CLI */
+if (require.main === module) (async () => {
+  const args = process.argv.slice(2);
+  const getOpt = (flag) => {
+    const i = args.indexOf(flag);
+    return i >= 0 ? args[i + 1] : undefined;
+  };
+
+  try {
+    const importPath = getOpt("--import");
+    if (importPath) { await runImport(importPath); return; }
+    const pdfPath = getOpt("--pdf");
+    if (pdfPath) {
+      await runLocalPdf(pdfPath, {
+        year: getOpt("--year") ? Number(getOpt("--year")) : undefined,
+        tournament: getOpt("--tournament"),
+      });
+    } else {
+      await runScrapePipeline();
+    }
+  } catch (e) {
+    console.error("❌ エラー:", e);
+    process.exit(1);
+  }
+})();
+
+module.exports = {
+  CONFIG, fetchHtml, collectPdfLinks, downloadPdf, parsePdfSmart,
+  extractResults, loadData, mergeIntoData, saveData, ensureDirs, sleep,
+};

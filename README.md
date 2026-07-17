@@ -1,31 +1,50 @@
-# 全国バドミントン成績アーカイブ（小中学生メイン）
-
-大会結果を全国のバドミントン協会・連盟サイトから**毎週自動収集**し、
-検索・年度別一覧・ポイントランキングをWebアプリで提供する。
-
-## セットアップ（1回だけ・5分）
-1. GitHubで新規リポジトリ作成（Public）
-2. このフォルダの中身を丸ごとアップロード（`index.html` / `backend/` / `.github/`）
-3. リポジトリの **Settings → Pages → Branch: main / (root)** で公開をON
-4. **Actions タブ → collect-badminton-results → Run workflow** で初回収集
-
-以上。以降は毎週土曜朝に自動で全国サイトを巡回し、`data.json` を更新。
-アプリURL（`https://<ユーザー名>.github.io/<リポジトリ名>/`）を開くだけで最新データが見られる。
-
-## 収集元を増やす
-`backend/sources.json` に1ブロック足すだけ。
-```json
-{ "name": "○○県小学生バドミントン連盟", "url": "https://...", "pref": "○○県", "type": "both", "depth": 1, "focus": "小学生" }
-```
-
-## 収集の仕組み（backend/）
-- `auto.js` … 巡回→PDF/HTML自動判定→解析→区分(小学生/中学生/社会人)・県タグ付与→data.json統合
-- `index.js` … 一覧形式PDF解析・OCRフォールバック・`--import`
-- `bracket.js` … トーナメント表PDFの座標解析（優勝/3位復元、review出力）
-- 精度方針: 順位が根拠付きで確定できたものだけ収録（推測しない）
-
-## ローカルで動かす場合
-```
-cd backend && npm install && npm i tesseract.js pdf-to-img && npm run auto
-```
-生成された `backend/output/data.json` をアプリの「data.json読込」で選択。
+{
+  "_readme": "収集元レジストリ。ここに1行足すだけで巡回対象が増える。type: html=ページ本文からも結果抽出 / pdf=リンクされた結果PDFを解析。depth: 1なら同一ドメインの『結果/大会』リンクを1階層たどる。pref: 都道府県タグ（全国大会は『全国』）。focus: 参考タグ。",
+  "sources": [
+    {
+      "name": "日本小学生バドミントン連盟（全国・小学生の総本山）",
+      "url": "https://www.syoubad.jp/",
+      "pref": "全国", "type": "both", "depth": 1, "focus": "小学生"
+    },
+    {
+      "name": "全国小学生選手権 結果ページ（badminton-a.com）",
+      "url": "http://www.badminton-a.com/20241228es/result.htm",
+      "pref": "全国", "type": "html", "depth": 1, "focus": "小学生"
+    },
+    {
+      "name": "日本バドミントン協会 大会結果",
+      "url": "https://www.badminton.or.jp/tournament",
+      "pref": "全国", "type": "both", "depth": 1, "focus": "一般"
+    },
+    {
+      "name": "神奈川県小学生バドミントン連盟",
+      "url": "https://www.kanagawa-elementary-badminton.jp/",
+      "pref": "神奈川県", "type": "both", "depth": 1, "focus": "小学生"
+    },
+    {
+      "name": "埼玉県小学生バドミントン連盟",
+      "url": "http://www.saibad.com/syogaku/",
+      "pref": "埼玉県", "type": "both", "depth": 1, "focus": "小学生"
+    },
+    {
+      "name": "新潟県小学生バドミントン連盟",
+      "url": "http://www.agano.net/njba/",
+      "pref": "新潟県", "type": "both", "depth": 1, "focus": "小学生"
+    },
+    {
+      "name": "長野県バドミントン協会 R8(2026年度)",
+      "url": "http://www.nagano-badminton.com/yotei-kekka/2026/R8taikai-kekka.html",
+      "pref": "長野県", "type": "pdf", "depth": 0, "focus": "全区分"
+    },
+    {
+      "name": "長野県バドミントン協会 R7(2025年度)",
+      "url": "http://www.nagano-badminton.com/yotei-kekka/2025/R7taikai-kekka.html",
+      "pref": "長野県", "type": "pdf", "depth": 0, "focus": "全区分"
+    },
+    {
+      "name": "福岡市バドミントン協会",
+      "url": "https://www.u-zak.ne.jp/FBA-C/",
+      "pref": "福岡県", "type": "both", "depth": 1, "focus": "全区分"
+    }
+  ]
+}
