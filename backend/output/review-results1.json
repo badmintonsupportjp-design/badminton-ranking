@@ -1,0 +1,113 @@
+{
+  "_note": "champions/third を目視確認し、確定した順位を players[].rank に反映してから index.js --import で取込むこと。ダブルスは優勝ペア2名が champions に並ぶ。",
+  "year": 2026,
+  "tournament": "results1.pdf",
+  "categories": [
+    {
+      "name": "ダブルス男子６年生以下",
+      "gender": "男子",
+      "grade": "一般",
+      "players": [
+        {
+          "name": "井上",
+          "team": "はちみつ",
+          "tournament": "results1.pdf",
+          "rank": 3,
+          "_evidence": "三位決定戦勝者"
+        }
+      ]
+    },
+    {
+      "name": "ダブルス男子５年生以下",
+      "gender": "男子",
+      "grade": "一般",
+      "players": [
+        {
+          "name": "松村",
+          "team": "はちみつ",
+          "tournament": "results1.pdf",
+          "rank": 3,
+          "_evidence": "三位決定戦勝者"
+        }
+      ]
+    },
+    {
+      "name": "ダブルス男子４年生以下",
+      "gender": "男子",
+      "grade": "一般",
+      "players": [
+        {
+          "name": "渡邉",
+          "team": "ふらっと",
+          "tournament": "results1.pdf",
+          "rank": 3,
+          "_evidence": "三位決定戦勝者"
+        }
+      ]
+    },
+    {
+      "name": "ダブルス女子６年生以下",
+      "gender": "女子",
+      "grade": "一般",
+      "players": [
+        {
+          "name": "高橋",
+          "team": "中野島",
+          "tournament": "results1.pdf",
+          "rank": 3,
+          "_evidence": "三位決定戦勝者"
+        }
+      ]
+    },
+    {
+      "name": "ダブルス女子５年生以下",
+      "gender": "女子",
+      "grade": "一般",
+      "players": [
+        {
+          "name": "三沢",
+          "team": "はちみつ",
+          "tournament": "results1.pdf",
+          "rank": 3,
+          "_evidence": "三位決定戦勝者"
+        }
+      ]
+    },
+    {
+      "name": "ダブルス女子４年生以下",
+      "gender": "女子",
+      "grade": "一般",
+      "players": [
+        {
+          "name": "樋口",
+          "team": "燕スポ少",
+          "tournament": "results1.pdf",
+          "rank": 3,
+          "_evidence": "三位決定戦勝者"
+        }
+      ]
+    },
+    {
+      "name": "シングルス女子２年生以下",
+      "gender": "女子",
+      "grade": "一般",
+      "players": [
+        {
+          "name": "阿部",
+          "team": "つばさＪＢＣ",
+          "tournament": "results1.pdf",
+          "rank": 3,
+          "_evidence": "三位決定戦勝者"
+        },
+        {
+          "name": "阿部",
+          "team": "つばさＪＢＣ",
+          "tournament": "results1.pdf",
+          "rank": 3,
+          "_evidence": "三位決定戦勝者"
+        }
+      ]
+    }
+  ],
+  "_warnings": []
+}

@@ -1,7 +1,92 @@
 {
   "_note": "champions/third を目視確認し、確定した順位を players[].rank に反映してから index.js --import で取込むこと。ダブルスは優勝ペア2名が champions に並ぶ。",
   "year": 2026,
-  "tournament": "results.pdf",
-  "categories": [],
+  "tournament": "第35回新潟県ジュニア小学生バドミントン大会(二日目結果)",
+  "categories": [
+    {
+      "name": "６年男子シングルス",
+      "gender": "男子",
+      "grade": "一般",
+      "players": [
+        {
+          "name": "阿部",
+          "team": "阿賀野",
+          "tournament": "第35回新潟県ジュニア小学生バドミントン大会(二日目結果)",
+          "rank": 3,
+          "_evidence": "三位決定戦勝者"
+        }
+      ]
+    },
+    {
+      "name": "５年男子シングルス",
+      "gender": "男子",
+      "grade": "一般",
+      "players": [
+        {
+          "name": "浦田",
+          "team": "小須戸",
+          "tournament": "第35回新潟県ジュニア小学生バドミントン大会(二日目結果)",
+          "rank": 3,
+          "_evidence": "三位決定戦勝者"
+        }
+      ]
+    },
+    {
+      "name": "４年男子シングルス",
+      "gender": "男子",
+      "grade": "一般",
+      "players": [
+        {
+          "name": "内山",
+          "team": "ＳＳモンキー",
+          "tournament": "第35回新潟県ジュニア小学生バドミントン大会(二日目結果)",
+          "rank": 3,
+          "_evidence": "三位決定戦勝者"
+        }
+      ]
+    },
+    {
+      "name": "６年女子シングルス",
+      "gender": "女子",
+      "grade": "一般",
+      "players": [
+        {
+          "name": "内山",
+          "team": "ラブオール",
+          "tournament": "第35回新潟県ジュニア小学生バドミントン大会(二日目結果)",
+          "rank": 3,
+          "_evidence": "三位決定戦勝者"
+        }
+      ]
+    },
+    {
+      "name": "５年女子シングルス",
+      "gender": "女子",
+      "grade": "一般",
+      "players": [
+        {
+          "name": "加藤",
+          "team": "つばさ",
+          "tournament": "第35回新潟県ジュニア小学生バドミントン大会(二日目結果)",
+          "rank": 3,
+          "_evidence": "三位決定戦勝者"
+        }
+      ]
+    },
+    {
+      "name": "４年女子シングルス",
+      "gender": "女子",
+      "grade": "一般",
+      "players": [
+        {
+          "name": "山田",
+          "team": "中野島",
+          "tournament": "第35回新潟県ジュニア小学生バドミントン大会(二日目結果)",
+          "rank": 3,
+          "_evidence": "三位決定戦勝者"
+        }
+      ]
+    }
+  ],
   "_warnings": []
 }

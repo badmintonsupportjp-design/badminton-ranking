@@ -1,0 +1,16 @@
+{
+  "_note": "champions/third を目視確認し、確定した順位を players[].rank に反映してから index.js --import で取込むこと。ダブルスは優勝ペア2名が champions に並ぶ。",
+  "year": 2026,
+  "tournament": "女単結果.pdf",
+  "categories": [
+    {
+      "name": "中学女子シングルス",
+      "gender": "女子",
+      "grade": "中学",
+      "players": []
+    }
+  ],
+  "_warnings": [
+    "三位決定戦マーカー(y=36.5)の勝者名を特定できず"
+  ]
+}

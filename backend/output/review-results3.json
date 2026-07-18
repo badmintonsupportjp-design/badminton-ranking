@@ -1,0 +1,68 @@
+{
+  "_note": "champions/third を目視確認し、確定した順位を players[].rank に反映してから index.js --import で取込むこと。ダブルスは優勝ペア2名が champions に並ぶ。",
+  "year": 2026,
+  "tournament": "results3.pdf",
+  "categories": [
+    {
+      "name": "５年生男子シングルス",
+      "gender": "男子",
+      "grade": "一般",
+      "players": []
+    },
+    {
+      "name": "３年生男子シングルス",
+      "gender": "男子",
+      "grade": "一般",
+      "players": []
+    },
+    {
+      "name": "６年生女子シングルス",
+      "gender": "女子",
+      "grade": "一般",
+      "players": []
+    },
+    {
+      "name": "４年生女子シングルス",
+      "gender": "女子",
+      "grade": "一般",
+      "players": []
+    },
+    {
+      "name": "１年生女子シングルス",
+      "gender": "女子",
+      "grade": "一般",
+      "players": []
+    },
+    {
+      "name": "４年生男子ダブルス",
+      "gender": "男子",
+      "grade": "一般",
+      "players": [
+        {
+          "name": "三位決定戦",
+          "team": "H30/2/3,阿賀野市ささかみ体育館",
+          "tournament": "results3.pdf",
+          "rank": 3,
+          "_evidence": "三位決定戦勝者"
+        },
+        {
+          "name": "三位決定戦",
+          "team": "H30/2/3,阿賀野市ささかみ体育館",
+          "tournament": "results3.pdf",
+          "rank": 3,
+          "_evidence": "三位決定戦勝者"
+        }
+      ]
+    },
+    {
+      "name": "４年生女子ダブルス",
+      "gender": "女子",
+      "grade": "一般",
+      "players": []
+    }
+  ],
+  "_warnings": [
+    "三位決定戦マーカー(y=51.9)の勝者名を特定できず",
+    "三位決定戦マーカー(y=51.9)の勝者名を特定できず"
+  ]
+}

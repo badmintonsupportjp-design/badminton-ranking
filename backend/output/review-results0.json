@@ -1,0 +1,101 @@
+{
+  "_note": "champions/third を目視確認し、確定した順位を players[].rank に反映してから index.js --import で取込むこと。ダブルスは優勝ペア2名が champions に並ぶ。",
+  "year": 2025,
+  "tournament": "results0.pdf",
+  "categories": [
+    {
+      "name": "新５年生男子シングルス",
+      "gender": "男子",
+      "grade": "一般",
+      "players": [
+        {
+          "name": "内堀柑太郎",
+          "team": "長岡大島",
+          "tournament": "results0.pdf",
+          "rank": 3,
+          "_evidence": "三位決定戦勝者"
+        },
+        {
+          "name": "内堀柑太郎",
+          "team": "長岡大島",
+          "tournament": "results0.pdf",
+          "rank": 3,
+          "_evidence": "三位決定戦勝者"
+        }
+      ]
+    },
+    {
+      "name": "新２年生男子シングルス",
+      "gender": "男子",
+      "grade": "一般",
+      "players": []
+    },
+    {
+      "name": "新５年生女子シングルス",
+      "gender": "女子",
+      "grade": "一般",
+      "players": [
+        {
+          "name": "三位決定戦",
+          "team": "新発田",
+          "tournament": "results0.pdf",
+          "rank": 3,
+          "_evidence": "三位決定戦勝者"
+        },
+        {
+          "name": "三位決定戦",
+          "team": "新発田",
+          "tournament": "results0.pdf",
+          "rank": 3,
+          "_evidence": "三位決定戦勝者"
+        }
+      ]
+    },
+    {
+      "name": "新３年生女子シングルス",
+      "gender": "女子",
+      "grade": "一般",
+      "players": []
+    },
+    {
+      "name": "新２・１年生女子シングルス",
+      "gender": "女子",
+      "grade": "一般",
+      "players": []
+    },
+    {
+      "name": "新５・４年生男子ダブルス",
+      "gender": "男子",
+      "grade": "一般",
+      "players": []
+    },
+    {
+      "name": "新４年生女子ダブルス",
+      "gender": "女子",
+      "grade": "一般",
+      "players": [
+        {
+          "name": "三位決定戦",
+          "team": "新津",
+          "tournament": "results0.pdf",
+          "rank": 3,
+          "_evidence": "三位決定戦勝者"
+        },
+        {
+          "name": "三位決定戦",
+          "team": "新津",
+          "tournament": "results0.pdf",
+          "rank": 3,
+          "_evidence": "三位決定戦勝者"
+        }
+      ]
+    }
+  ],
+  "_warnings": [
+    "三位決定戦マーカー(y=51.9)の勝者名を特定できず",
+    "三位決定戦マーカー(y=51.9)の勝者名を特定できず",
+    "三位決定戦マーカー(y=51.9)の勝者名を特定できず",
+    "三位決定戦マーカー(y=51.9)の勝者名を特定できず",
+    "三位決定戦マーカー(y=51.9)の勝者名を特定できず"
+  ]
+}

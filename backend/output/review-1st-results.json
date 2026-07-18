@@ -1,0 +1,80 @@
+{
+  "_note": "champions/third を目視確認し、確定した順位を players[].rank に反映してから index.js --import で取込むこと。ダブルスは優勝ペア2名が champions に並ぶ。",
+  "year": 2024,
+  "tournament": "1st-results.pdf",
+  "categories": [
+    {
+      "name": "男子シングルス６年生以下の部",
+      "gender": "男子",
+      "grade": "一般",
+      "players": []
+    },
+    {
+      "name": "男子シングルス５年生以下の部",
+      "gender": "男子",
+      "grade": "一般",
+      "players": []
+    },
+    {
+      "name": "男子シングルス４年生以下の部",
+      "gender": "男子",
+      "grade": "一般",
+      "players": []
+    },
+    {
+      "name": "男子ダブルス６年生以下の部",
+      "gender": "男子",
+      "grade": "一般",
+      "players": []
+    },
+    {
+      "name": "男子ダブルス５年生以下の部",
+      "gender": "男子",
+      "grade": "一般",
+      "players": []
+    },
+    {
+      "name": "男子ダブルス４年生以下の部",
+      "gender": "男子",
+      "grade": "一般",
+      "players": []
+    },
+    {
+      "name": "女子シングルス６年生以下の部",
+      "gender": "女子",
+      "grade": "一般",
+      "players": []
+    },
+    {
+      "name": "女子シングルス５年生以下の部",
+      "gender": "女子",
+      "grade": "一般",
+      "players": []
+    },
+    {
+      "name": "女子シングルス４年生以下の部",
+      "gender": "女子",
+      "grade": "一般",
+      "players": []
+    },
+    {
+      "name": "女子ダブルス６年生以下の部",
+      "gender": "女子",
+      "grade": "一般",
+      "players": []
+    },
+    {
+      "name": "女子ダブルス５年生以下の部",
+      "gender": "女子",
+      "grade": "一般",
+      "players": []
+    },
+    {
+      "name": "女子ダブルス４年生以下の部",
+      "gender": "女子",
+      "grade": "一般",
+      "players": []
+    }
+  ],
+  "_warnings": []
+}

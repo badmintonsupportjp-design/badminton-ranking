@@ -1,0 +1,7 @@
+{
+  "_note": "champions/third を目視確認し、確定した順位を players[].rank に反映してから index.js --import で取込むこと。ダブルスは優勝ペア2名が champions に並ぶ。",
+  "year": 2026,
+  "tournament": "第４２回若葉カップ全国小学生バドミントン大会長野県選考会　　令和８年５月６日　　佐久市総合体育館",
+  "categories": [],
+  "_warnings": []
+}

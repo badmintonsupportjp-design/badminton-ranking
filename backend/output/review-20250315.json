@@ -1,0 +1,26 @@
+{
+  "_note": "champions/third を目視確認し、確定した順位を players[].rank に反映してから index.js --import で取込むこと。ダブルスは優勝ペア2名が champions に並ぶ。",
+  "year": 2026,
+  "tournament": "20250315.pdf",
+  "categories": [
+    {
+      "name": "５年男子ダブルス",
+      "gender": "男子",
+      "grade": "一般",
+      "players": []
+    },
+    {
+      "name": "３年以下男子ダブルス",
+      "gender": "男子",
+      "grade": "一般",
+      "players": []
+    },
+    {
+      "name": "５年女子ダブルス",
+      "gender": "女子",
+      "grade": "一般",
+      "players": []
+    }
+  ],
+  "_warnings": []
+}

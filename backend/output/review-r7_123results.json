@@ -1,0 +1,44 @@
+{
+  "_note": "champions/third を目視確認し、確定した順位を players[].rank に反映してから index.js --import で取込むこと。ダブルスは優勝ペア2名が champions に並ぶ。",
+  "year": 2026,
+  "tournament": "r7_123results.pdf",
+  "categories": [
+    {
+      "name": "男子シングルス３年生以下",
+      "gender": "男子",
+      "grade": "一般",
+      "players": []
+    },
+    {
+      "name": "男子シングルス１年生以下",
+      "gender": "男子",
+      "grade": "一般",
+      "players": []
+    },
+    {
+      "name": "女子シングルス３年生以下",
+      "gender": "女子",
+      "grade": "一般",
+      "players": []
+    },
+    {
+      "name": "女子シングルス３年生以下",
+      "gender": "女子",
+      "grade": "一般",
+      "players": []
+    },
+    {
+      "name": "女子シングルス２年生以下",
+      "gender": "女子",
+      "grade": "一般",
+      "players": []
+    },
+    {
+      "name": "女子シングルス１年生以下",
+      "gender": "女子",
+      "grade": "一般",
+      "players": []
+    }
+  ],
+  "_warnings": []
+}

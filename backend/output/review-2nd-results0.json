@@ -1,0 +1,92 @@
+{
+  "_note": "champions/third を目視確認し、確定した順位を players[].rank に反映してから index.js --import で取込むこと。ダブルスは優勝ペア2名が champions に並ぶ。",
+  "year": 2026,
+  "tournament": "2nd-results0.pdf",
+  "categories": [
+    {
+      "name": "シングルス男子６年生以下",
+      "gender": "男子",
+      "grade": "一般",
+      "players": [
+        {
+          "name": "矢部",
+          "team": "燕スポ少",
+          "tournament": "2nd-results0.pdf",
+          "rank": 3,
+          "_evidence": "三位決定戦勝者"
+        }
+      ]
+    },
+    {
+      "name": "シングルス男子５年生以下",
+      "gender": "男子",
+      "grade": "一般",
+      "players": [
+        {
+          "name": "内山",
+          "team": "ふらっと",
+          "tournament": "2nd-results0.pdf",
+          "rank": 3,
+          "_evidence": "三位決定戦勝者"
+        }
+      ]
+    },
+    {
+      "name": "シングルス男子４年生以下",
+      "gender": "男子",
+      "grade": "一般",
+      "players": [
+        {
+          "name": "德橋",
+          "team": "ふらっと",
+          "tournament": "2nd-results0.pdf",
+          "rank": 3,
+          "_evidence": "三位決定戦勝者"
+        }
+      ]
+    },
+    {
+      "name": "シングルス女子６年生以下",
+      "gender": "女子",
+      "grade": "一般",
+      "players": [
+        {
+          "name": "加藤",
+          "team": "阿賀野",
+          "tournament": "2nd-results0.pdf",
+          "rank": 3,
+          "_evidence": "三位決定戦勝者"
+        }
+      ]
+    },
+    {
+      "name": "シングルス女子５年生以下",
+      "gender": "女子",
+      "grade": "一般",
+      "players": [
+        {
+          "name": "佐藤",
+          "team": "ＳＳモンキー",
+          "tournament": "2nd-results0.pdf",
+          "rank": 3,
+          "_evidence": "三位決定戦勝者"
+        }
+      ]
+    },
+    {
+      "name": "シングルス女子４年生以下",
+      "gender": "女子",
+      "grade": "一般",
+      "players": [
+        {
+          "name": "阿部",
+          "team": "ＳＳモンキー",
+          "tournament": "2nd-results0.pdf",
+          "rank": 3,
+          "_evidence": "三位決定戦勝者"
+        }
+      ]
+    }
+  ],
+  "_warnings": []
+}

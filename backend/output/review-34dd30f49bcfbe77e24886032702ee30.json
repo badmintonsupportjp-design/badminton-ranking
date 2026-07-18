@@ -1,0 +1,38 @@
+{
+  "_note": "champions/third を目視確認し、確定した順位を players[].rank に反映してから index.js --import で取込むこと。ダブルスは優勝ペア2名が champions に並ぶ。",
+  "year": 2026,
+  "tournament": "第12回神奈川県小学生バドミントン連盟ダブルス戦交流大会",
+  "categories": [
+    {
+      "name": "５年男子ダブルス",
+      "gender": "男子",
+      "grade": "一般",
+      "players": []
+    },
+    {
+      "name": "３年以下男子ダブルス",
+      "gender": "男子",
+      "grade": "一般",
+      "players": []
+    },
+    {
+      "name": "６年女子ダブルス",
+      "gender": "女子",
+      "grade": "一般",
+      "players": []
+    },
+    {
+      "name": "５年女子ダブルス",
+      "gender": "女子",
+      "grade": "一般",
+      "players": []
+    },
+    {
+      "name": "３年以下女子ダブルス",
+      "gender": "女子",
+      "grade": "一般",
+      "players": []
+    }
+  ],
+  "_warnings": []
+}

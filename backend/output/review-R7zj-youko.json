@@ -1,0 +1,14 @@
+{
+  "_note": "champions/third を目視確認し、確定した順位を players[].rank に反映してから index.js --import で取込むこと。ダブルスは優勝ペア2名が champions に並ぶ。",
+  "year": 2025,
+  "tournament": "第44回全日本ジュニアバドミントン大会長野県予選会（ジュニアの部）",
+  "categories": [
+    {
+      "name": "（２）ダブルス",
+      "gender": "不明",
+      "grade": "一般",
+      "players": []
+    }
+  ],
+  "_warnings": []
+}
