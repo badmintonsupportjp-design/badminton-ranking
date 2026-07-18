@@ -180,7 +180,7 @@ function rankValue(rankText) {
 }
 
 function parseCategoryName(raw) {
-  const name = zenToHan(raw).replace(/\s+/g, "");
+  const name = zenToHan(raw).replace(/[\[\]［］【】]/g, "").replace(/\s+/g, "");
   const gender = name.includes("男子")
     ? "男子"
     : name.includes("女子")
@@ -216,15 +216,33 @@ function parseFinalRankLine(rawLine) {
   while ((m = re.exec(s)) !== null) {
     for (const nm of m[2].split(/[・、,／/]/)) {
       const name = nm.trim();
-      if (name.length >= 2 && name.length <= 25 && !/[()（）\d]{3,}/.test(name)) {
-        out.push({ name, team: "", rank: Number(m[1]) });
-      }
+      if (isValidName(name)) out.push({ name, team: "", rank: Number(m[1]) });
     }
   }
   return out.length ? out : null;
 }
 
-const SCORE_RE = /\d+\s*[-ー−]\s*\d+/;
+const SCORE_RE = /\d+\s*[-ー−一~〜>＞]\s*\d+/;
+
+/**
+ * 氏名・チーム名として成立しているかの検問（OCRゴミ排除の最重要関門）
+ * 落とすもの: スコア断片(9一1, 9>1)、種目見出し(男子単5~)、記号列(a b c d e f g h)、数字だけ 等
+ */
+function isValidName(s) {
+  const t = String(s || "").trim();
+  if (t.length < 2 || t.length > 25) return false;
+  if (/[~〜<>＜＞=＝*＊#№]/.test(t)) return false;                    // 名前に出ない記号
+  if (SCORE_RE.test(t)) return false;                                   // スコア形
+  if (/^[\d\s一ー−-]+$/.test(t)) return false;                        // 数字・線だけ
+  const core = t.replace(/[\s 　]/g, "");
+  if (/^(男子|女子|混合)?(単|複|シングルス|ダブルス|団体|トーナメント|リーグ|決勝|予選|順位|結果)/.test(core)) return false; // 種目・見出し語
+  if (/^([A-Za-z][\s 　]+){2,}[A-Za-z]$/.test(t)) return false;        // a b c d 型
+  const jp = (t.match(/[一-龠々〆ぁ-んァ-ヴー]/g) || []).length;
+  const ascii = (t.match(/[A-Za-z0-9]/g) || []).length;
+  if (jp < 2 && ascii < 3) return false;                                // 実体不足
+  if (/\d/.test(t) && jp < 2) return false;                            // 数字混じりで日本語実体なし
+  return true;
+}
 
 /**
  * PDFテキスト → { year, tournament, categories[] }
@@ -286,7 +304,7 @@ function extractResults(rawText, overrides = {}) {
     NAME_TEAM_RE.lastIndex = 0;
     while ((em = NAME_TEAM_RE.exec(stripped)) !== null) {
       const nm = em[1].replace(/\s+/g, " ").trim();
-      if (nm.length < 2 || /(位|優勝|ベスト|リーグ|決定戦)/.test(nm.replace(/\s/g, ""))) continue;
+      if (!isValidName(nm) || /(位|優勝|ベスト|決定戦)/.test(nm.replace(/\s/g, ""))) continue;
       hadEntry = true;
       if (!entries.has(nm)) entries.set(nm, { team: em[2].trim(), cat: current });
     }
@@ -301,14 +319,14 @@ function extractResults(rawText, overrides = {}) {
       while ((m2 = NAME_TEAM_RE.exec(stripped)) !== null) {
         const name = m2[1].replace(/\s+/g, " ").trim();
         const team = m2[2].trim();
-        if (name.length < 2 || /(位|優勝|ベスト)/.test(name.replace(/\s/g, ""))) continue;
+        if (!isValidName(name) || /(位|優勝|ベスト)/.test(name.replace(/\s/g, ""))) continue;
         current.players.push({ name, team, tournament, rank });
         matched = true;
       }
       // 括弧なし（チーム名だけ）の順位行: 「優勝 小布施ジュニア」
       if (!matched && !SCORE_RE.test(line) && !/[（(]/.test(stripped)) {
         const rest = stripped.replace(/^[  :：・･、]+/, "").trim();
-        if (rest.length >= 2 && rest.length <= 25 && !/^\d+$/.test(rest)) {
+        if (isValidName(rest)) {
           current.players.push({ name: rest, team: "", tournament, rank });
         }
       }
