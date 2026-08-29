@@ -1854,21 +1854,6 @@
         "division": "小学生"
       },
       {
-        "name": "女子単Dクラス",
-        "gender": "女子",
-        "grade": "不明",
-        "players": [
-          {
-            "name": "種 目 三 位",
-            "team": "",
-            "tournament": "第34回福岡障がい者ｵｰﾌﾟﾝﾊﾞﾄﾞﾐﾝﾄﾝ大会",
-            "rank": 1
-          }
-        ],
-        "pref": "福岡県",
-        "division": "その他"
-      },
-      {
         "name": "男子複",
         "gender": "男子",
         "grade": "不明",
