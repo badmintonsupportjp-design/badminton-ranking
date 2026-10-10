@@ -1077,27 +1077,6 @@
         "division": "小学生"
       },
       {
-        "name": "総合成績",
-        "gender": "不明",
-        "grade": "不明",
-        "players": [
-          {
-            "name": "Wei",
-            "team": "7",
-            "tournament": "日本バドミントン協会（USオープン2026）",
-            "rank": 1
-          },
-          {
-            "name": "Wei",
-            "team": "6",
-            "tournament": "日本バドミントン協会（カナダオープン2026）",
-            "rank": 1
-          }
-        ],
-        "pref": "全国",
-        "division": "その他"
-      },
-      {
         "name": "4年以下男子ダブルス",
         "gender": "男子",
         "grade": "一般",
